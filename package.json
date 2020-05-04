@@ -1,0 +1,24 @@
+{
+  "name": "notes_node_serv",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "testNoTrack": "jest",
+    "test": "jest --runInBand",
+    "checklintrules": "npx eslint *.js api/*.js db/*.js",
+    "checkformatting": "npx prettier --check *.js api/*.js db/*.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "neo4j-driver": "^4.0.2",
+    "njwt": "^1.0.0",
+    "supertest": "^4.0.2"
+  },
+  "devDependencies": {
+    "jest": "^25.5.3"
+  }
+}
