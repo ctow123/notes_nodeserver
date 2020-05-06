@@ -5,7 +5,8 @@ var app = express();
 var nJwt = require("njwt");
 // var _ = require('lodash');
 // Database
-// var Movie = require('./models/Movie');
+// models
+var Node = require('./Node.js');
 const neo4j = require("neo4j-driver");
 
 var driver = neo4j.driver(
@@ -13,8 +14,9 @@ var driver = neo4j.driver(
   neo4j.auth.basic("neo4j", "qwe-34-vo")
 );
 
-// makes note, note requires data in json in the form {title, text, username, tags: []}
-// need to add date created field, date modified field
+/* makes note, note requires data in json in the form {title, text, username, datecreated, dateupdated, tags: []}
+will autosend date created / updated
+ need to add date created field, date modified field */
 async function makeNote(note) {
   var session = driver.session();
   var query = [];
@@ -104,7 +106,7 @@ function getTags(tag) {
     .run("MATCH (n:Tag) RETURN n")
     .then(result => {
       session.close();
-      return result;
+      return result.records;
     })
     .catch(error => {
       session.close();
@@ -117,12 +119,11 @@ function searchNotesTag(query) {
   var session = driver.session();
   // session.close will return a promise so returning session means this function returns a prommise
   return session
-    .run(
-      "MATCH (t:Tag {tag: {thetag}})-[:MENTIONED_IN]->(p) RETURN p",{thetag: query.tag}
-    )
+    .run("MATCH (t:Tag {tag: {thetag}})-[:MENTIONED_IN]->(p) RETURN p", {
+      thetag: query.tag
+    })
     .then(result => {
       session.close();
-      console.log(result.records);
       return result.records;
     })
     .catch(error => {
@@ -142,7 +143,7 @@ const AuthMiddleWare = (req, res, next) => {
   nJwt.verify(req.body.accessToken, secretKey, function(err, token) {
     if (err) {
       // respond to request with error
-          res.status(400).json({error: 'authorization required'})
+      res.status(400).json({ error: "authorization required" });
     } else {
       // continue with the request
       next();
@@ -156,12 +157,17 @@ app.use(express.json());
 // notes routes, all require auth
 // create a note, data will be json {title, text, username, tags: [string array]}
 app.post("/makenote", (req, res) => {
-  makeNote(req.body).then(results => {
-    res.status(201).json({stats: results.summary.updateStatistics._stats, message: 'note created'})
-    console.log(results.summary.updateStatistics._stats);
-  }).catch(err => {
-    res.status(400).json({error: err.toString()})
-  });
+  makeNote(req.body)
+    .then(results => {
+      res.status(201).json({
+        stats: results.summary.updateStatistics._stats,
+        message: "note created"
+      });
+      console.log(results.summary.updateStatistics._stats);
+    })
+    .catch(err => {
+      res.status(400).json({ error: err.toString() });
+    });
 });
 
 // user can edit text, tags, or title of their note
@@ -172,24 +178,41 @@ app.put("/editnote/:id", (req, res) => {
 });
 
 // retrieve all notes specificed by params {lookupBy, lookupField}
-// lookupBy: title, tag, date, lookupField
+// lookupBy: title, tag, date & lookupField: input
+// longerterm input a word/phrase and intelligently search by all of the above
+//  search by text of doc
+// curl localhost:8100/searchnotes?lookupBy=tag&lookupField=startup
 app.get("/searchnotes", (req, res) => {
-
-  searchNotesTag({tag: 'startup'}).then(results => {
-    console.log(results);
-  })
-  res.send("created note");
+  if (req.query.lookupBy === "tag") {
+    searchNotesTag({ tag: req.query.lookupField }).then(records => {
+      arrayofnodes = []
+      // assumes each record only has one node
+      records.forEach(record => arrayofnodes.push(Node(record._fields[0])));
+      // console.log(arrayofnodes);
+      res.status(200).json({ message: "search completed", notes: arrayofnodes });
+    }).catch(err => {res.status(400).json({error: err.toString()})});
+  } else if (req.query.lookupBy === "title") {
+        res.status(200).json({ message: "search completed" });
+  } else if (req.query.lookupBy === "date") {
+        res.status(200).json({ message: "search completed" });
+  } else {
+    // smart search
+    res.status(200).json({ message: "search completed" });
+  }
 });
 
 // get list of all possible tags
 app.get("/getTagsList", (req, res) => {
-  getTags.then(tags => {
-    console.log(tags);
-    res.status(200)
-    // .json({tags: tags})
-  }).catch(err => {
-    res.status(400).json({error: err.toString()})
-  })
+  getTags()
+    .then(tags => {
+      tagsarray = [];
+      tags.forEach(tag => tagsarray.push(Node(tag._fields[0])))
+      res.status(200).json({tags: tagsarray});
+      // .json({tags: tags})
+    })
+    .catch(err => {
+      res.status(400).json({ error: err.toString() });
+    });
 });
 
 // user wants to delete a note
