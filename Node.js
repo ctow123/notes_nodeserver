@@ -1,16 +1,13 @@
-
-function Node(thenode) {
+// handles a record
+function Node(record) {
   let result = {};
-  result['id'] = thenode.identity.low;
-  // var obj = JSON.parse(thenode.properties)
-  console.log(thenode.properties);
-  let props = thenode.properties
-  for(var key in thenode.properties){
-    result[key] = props[key];
+  console.log(record.keys);
+  console.log(record);
+
+  for(var key in record.keys){
+    result[key] = record.get(key)
   }
-  // result['title'] = thenode.properties.title;
-  // result['text'] = thenode.properties.text;
-  // result['username'] = thenode.properties.username;
+
   return result;
 }
 

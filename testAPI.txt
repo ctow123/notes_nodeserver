@@ -1,1 +1,9 @@
 curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"], "username": "bilol"}' --header "Content-Type: application/json" localhost:8100/makenote -w "\n"
+
+curl 'localhost:8100/searchnotes?lookupField=startup&lookupBy=tag'
+curl 'localhost:8100/searchnotes?lookupField=startup&lookupBy=tag&username=bilol'
+
+curl -X PUT -d '{"title":"haemailtype is cool"}' --header "Content-Type: application/json" localhost:8100/editnote/5
+
+
+curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://www.example.com
