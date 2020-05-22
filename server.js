@@ -3,7 +3,7 @@ var url = require("url");
 var express = require("express");
 var app = express();
 var nJwt = require("njwt");
-// var _ = require('lodash');
+var fs = require("fs");
 // Database
 // models
 var Node = require("./Node.js");
@@ -25,7 +25,7 @@ async function makeNote(note, username) {
   query.push(
     "CREATE (" +
       note.title +
-      ":Note {title: $title, text: $text, username: $username, datecreated: $date})"
+      ":Note {title: $title, text: $text, username: $username, datecreated: $date, dateupdated: $date})"
   );
   params.title = note.title;
   params.text = note.text;
@@ -34,11 +34,17 @@ async function makeNote(note, username) {
   for (let i = 0; i < note.tags.length; i++) {
     note.tags[i] = note.tags[i].substring(1);
     await getTag(note.tags[i], username).then(result => {
-      // console.log(result);
-      if (result) {
+      if (result.exists) {
         query.push("WITH " + note.title + "");
         query.push(
-          "MATCH (" +note.tags[i] +":Tag) WHERE " +note.tags[i] + ".tag in {tag" +i +"} AND " + note.tags[i] +
+          "MATCH (" +
+            note.tags[i] +
+            ":Tag) WHERE " +
+            note.tags[i] +
+            ".tag in {tag" +
+            i +
+            "} AND " +
+            note.tags[i] +
             ".username = $username"
         );
         query.push(
@@ -67,21 +73,15 @@ async function makeNote(note, username) {
       }
     });
   }
-  query.push("RETURN " + note.title);
+  query.push("RETURN id(" + note.title + ")");
 
-  console.log(query);
-  console.log(params);
+  // console.log(query);
+  // console.log(params);
   return session
     .run(query.join(" "), params)
     .then(result => {
       session.close();
-      console.log(result.records[0]._fields[0].low);
-      console.log(result.records);
-      for (let property in result.records[0]) {
-        console.log(property);
-        console.log(result.records[0][property]);
-      }
-      // console.log(result);
+      console.log(result.records[0].get(0).toNumber());
       return result;
     })
     .catch(error => {
@@ -91,27 +91,177 @@ async function makeNote(note, username) {
 }
 
 // edit the title, text, or tags of a note
-function editNote(){
-  // var session = driver.session();
-  // return session
-  //   .run(
-  //     // MATCH (n:Note) WHERE id(n)=46 MATCH (n)-[rel:TALKS_ABOUT]-(p:Tag {tag:'node'}) Delete rel RETURN n,rel,p
-  //     "",
-  //     { tag: tag}
-  //   )
-  //   .then(result => {
-  //     session.close();
-  //     return result
-  //   })
-  //   .catch(error => {
-  //     session.close();
-  //     throw error;
-  //   });
+async function editNote(type, id, note, username) {
+  let add;
+  let remove;
+  if (type === "title") {
+    var session = driver.session();
+    let stats = await session
+      .run(
+        "MATCH (n:Note) WHERE id(n)={noteid} SET n.title = $title RETURN n",
+        {
+          noteid: parseInt(id),
+          title: note.title
+        }
+      )
+      .then(result => {
+        session.close();
+        return result;
+      })
+      .catch(error => {
+        session.close();
+        throw error;
+      });
+    return stats.summary.updateStatistics;
+  } else if (type === "text") {
+    var session = driver.session();
+    let stats = await session
+      .run("MATCH (n:Note) WHERE id(n)={noteid} SET n.text = $text RETURN n", {
+        noteid: parseInt(id),
+        text: note.text
+      })
+      .then(result => {
+        session.close();
+        return result;
+      })
+      .catch(error => {
+        session.close();
+        throw error;
+      });
+    return stats.summary.updateStatistics;
+  } else if (type === "tag") {
+    let updateTags = await getTagsForNote(id, username)
+      .then(oldtags => {
+        let newtags = note.tags;
+        remove = oldtags.filter(x => !newtags.includes(x));
+        add = newtags.filter(x => !oldtags.includes(x));
+        return { remove: remove, add: add };
+      })
+      .catch(err => {
+        throw err;
+      });
+    var stats = {updateTags: updateTags, firstquery: '', secondquery: '', firstqueryparams: '', secondqueryparams: '' };
+    var query = [];
+    var params = {};
+    params["username"] = username;
+    params["id"] = parseInt(id);
+
+    for (let [i, item] of updateTags.remove.entries()) {
+      try {
+        query.push(
+          "MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag" +
+            i +
+            ", username: $username}) DELETE rel"
+        );
+        if (i < updateTags.remove.length - 1) {
+          query.push("WITH true as pass");
+        }
+        params["tag" + i] = item;
+      } catch (error) {
+        console.log("error" + error);
+      }
+    }
+    stats.firstquery = query;
+    stats.firstqueryparams = params;
+    if (query.length != 0) {
+      var session = driver.session();
+      session
+        .run(query.join(" "), params)
+        .then(result => {
+          session.close();
+          stats.updateStats = Object.assign({},result.summary.updateStatistics._stats);
+        })
+        .catch(error => {
+          session.close();
+          throw error;
+        });
+    }
+    // adding tags
+    query = [];
+    params = {};
+    params["username"] = username;
+    params["id"] = parseInt(id);
+
+    for (let [i, item] of updateTags.add.entries()) {
+      try {
+        let num = i + updateTags.remove.length;
+        let tag = await getTag(item, username);
+        if (tag.exists) {
+          query.push(
+            "MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum" +
+              num +
+              " WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"
+          );
+          if (i < updateTags.add.length - 1) {
+            query.push("WITH true as pass");
+          }
+          params["tag" + num] = item;
+          params["tagnum" + num] = tag.idnum;
+        } else {
+          query.push(
+            "CREATE (" +
+              "tag" +
+              num +
+              ":Tag {tag: $tag" +
+              num +
+              ", username: $username})"
+          );
+          query.push("WITH tag" + num);
+          query.push("MATCH (n:Note {username: $username}) WHERE id(n)={id}");
+          query.push("CREATE (n)-[:TALKS_ABOUT]->(tag" + num + ")");
+          query.push("CREATE (tag" + num + ")-[:MENTIONED_IN]->(n)");
+          if (i < updateTags.add.length - 1) {
+            query.push("WITH true as pass");
+          }
+          params["tag" + num] = item;
+        }
+      } catch (error) {
+        console.log("error" + error);
+      }
+    }
+    stats.secondquery = query;
+    stats.secondqueryparams = params;
+    if (query.length != 0) {
+      var session = driver.session();
+      session
+        .run(query.join(" "), params)
+        .then(result => {
+          session.close();
+          for (key in result.summary.updateStatistics._stats) {
+            if (typeof stats.updateStats !== 'undefined' &&  key in stats.updateStats) {
+              stats.updateStats[key] = stats.updateStats[key] + result.summary.updateStatistics._stats[key];
+            }
+          }
+        })
+        .catch(error => {
+          session.close();
+          throw error;
+        });
+    }
+    return stats;
+  }
 }
 
 // get all tags assocaited with a note for a user
-function getTagsForNote(noteid, username){
-
+function getTagsForNote(noteid, username) {
+  var session = driver.session();
+  return session
+    .run(
+      "MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel:TALKS_ABOUT]-(p:Tag) RETURN p.tag",
+      { id: parseInt(noteid), username: username }
+    )
+    .then(result => {
+      session.close();
+      let tagsarray = [];
+      result.records.forEach(record => {
+        tagsarray.push(record.get(0));
+      });
+      return tagsarray;
+    })
+    .catch(error => {
+      session.close();
+      throw error;
+    });
 }
 
 // tag should be a string
@@ -119,16 +269,16 @@ function getTag(tag, username) {
   var session = driver.session();
   return session
     .run(
-      "MATCH (a:Tag) WHERE a.tag in {tag} AND a.username = {username} RETURN a",
+      "MATCH (a:Tag) WHERE a.tag in {tag} AND a.username = {username} RETURN id(a)",
       { tag: tag, username: username }
     )
     .then(result => {
       session.close();
-      // console.log("getTag results ", result.records);
+      // console.log("getTag results ", result.records[0].get(0).toNumber());
       if (result.records.length >= 1) {
-        return true;
+        return { exists: true, idnum: result.records[0].get(0).toNumber() };
       } else {
-        return false;
+        return { exists: false };
       }
     })
     .catch(error => {
@@ -141,7 +291,7 @@ function getTag(tag, username) {
 function getTags(username) {
   var session = driver.session();
   return session
-    .run("MATCH (n:Tag) WHERE n.username = {username} RETURN n.tag",{
+    .run("MATCH (n:Tag) WHERE n.username = {username} RETURN n.tag", {
       username: username
     })
     .then(result => {
@@ -177,12 +327,11 @@ function searchNotesTag(query) {
     });
 }
 
-
 //  ---------- custom middleware create
 let secretKey = "super secert key";
 const AuthMiddleWare = (req, res, next) => {
   let key =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOnRydWUsImV4cCI6MTU4OTkyMDQ4Nn0.1NkqZr_bhOpQ4-rDkckzJmUcmIevKMrhfsTpEfusCs0";
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOnRydWUsImV4cCI6MTU5MDE3OTgzN30.b2rlviAXMwsEKbbkyVXrlRTIqu2yZtUcRxgPaeQ7NVg";
 
   nJwt.verify(key, secretKey, function(err, token) {
     // req.body.accessToken
@@ -192,27 +341,37 @@ const AuthMiddleWare = (req, res, next) => {
       console.log(err);
       res.status(400).json({ error: "authorization required" });
     } else {
-      // continue with the request
-
       req.token = token.body;
       next();
     }
   });
 };
 // ------- methods ----
+var router = express.Router();
 app.use(express.json());
 app.use(AuthMiddleWare);
+// add note add here
+app.use("/", router);
 
 // notes routes, all require auth
 // create a note, data will be json {title, text, username, tags: [string array]}
-app.post("/makenote", (req, res) => {
+router.post("/makenote", (req, res) => {
   makeNote(req.body, req.token.username)
     .then(results => {
-      res.status(201).json({
-        stats: results.summary.updateStatistics._stats,
-        message: "note created"
+      let str =
+        Date.now().toString() +
+        " " + results.records[0].get(0).toNumber() + " " +
+        JSON.stringify(results.summary.updateStatistics._stats) +
+        "\n";
+      fs.appendFile("noteMakeLog.txt", str, function(err) {
+        if (err) {
+          console.log(err);
+        }
       });
-      console.log(results.summary.updateStatistics._stats);
+      res.status(201).json({
+        message: "note created",
+        noteid: results.records[0].get(0).toNumber()
+      });
     })
     .catch(err => {
       res.status(400).json({ error: err.toString() });
@@ -220,12 +379,26 @@ app.post("/makenote", (req, res) => {
 });
 
 // user can edit text, tags, or title of their note
-app.put("/editnote/:id", (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
-  // makeNote();
-  // MATCH (s) WHERE id(s) = 39 return s
-  res.send("created note");
+router.put("/editnote/:id", (req, res) => {
+  console.log("params + body ", req.params, req.body);
+  let stats = editNote(
+    req.body.type,
+    req.params.id,
+    req.body.note,
+    req.token.username
+  )
+    .then(r => {
+      let str = Date.now().toString() + " " + JSON.stringify(r) + "\n";
+      fs.appendFile("noteEditLog.txt", str, function(err) {
+        if (err) {
+          console.log(err);
+        }
+      });
+      res.status(200).json({ message: "edit complete" });
+    })
+    .catch(err => {
+      res.status(400).json({ message: err.toString() });
+    });
 });
 
 // retrieve all notes specificed by params {lookupBy, lookupField}
@@ -233,7 +406,7 @@ app.put("/editnote/:id", (req, res) => {
 // longerterm input a word/phrase and intelligently search by all of the above
 //  search by text of doc
 // curl localhost:8100/searchnotes?lookupBy=tag&lookupField=startup
-app.get("/searchnotes", (req, res) => {
+router.get("/searchnotes", (req, res) => {
   if (req.query.lookupBy === "tag") {
     searchNotesTag({ tag: req.query.lookupField, username: req.token.username })
       .then(records => {
@@ -250,7 +423,6 @@ app.get("/searchnotes", (req, res) => {
             };
           }
         });
-        // console.log(arrayofnodes);
         res
           .status(200)
           .json({ message: "search completed", notes: arrayofnodes });
@@ -269,7 +441,7 @@ app.get("/searchnotes", (req, res) => {
 });
 
 // get list of all possible tags for a user
-app.get("/getTagsList", (req, res) => {
+router.get("/getTagsList", (req, res) => {
   getTags(req.token.username)
     .then(tags => {
       tagsarray = [];
@@ -282,7 +454,7 @@ app.get("/getTagsList", (req, res) => {
 });
 
 // user wants to delete a note
-app.delete("/deletenote", (req, res) => {
+router.delete("/deletenote", (req, res) => {
   console.log(req.body);
   // makeNote();
   res.send("created note");
