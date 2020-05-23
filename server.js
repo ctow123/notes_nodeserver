@@ -4,6 +4,7 @@ var express = require("express");
 var app = express();
 var nJwt = require("njwt");
 var fs = require("fs");
+var cors = require("cors");
 // Database
 // models
 var Node = require("./Node.js");
@@ -23,19 +24,18 @@ async function makeNote(note, username) {
   var params = {};
   var tags = [];
   query.push(
-    "CREATE (" +
-      note.title +
-      ":Note {title: $title, text: $text, username: $username, datecreated: $date, dateupdated: $date})"
+    "CREATE (n:Note {title: $title, text: $text, username: $username, datecreated: $date, dateupdated: $date})"
   );
   params.title = note.title;
   params.text = note.text;
   params.username = username;
   params.date = Date.now();
   for (let i = 0; i < note.tags.length; i++) {
-    note.tags[i] = note.tags[i].substring(1);
+    // turn on if hashtags
+    // note.tags[i] = note.tags[i].substring(1);
     await getTag(note.tags[i], username).then(result => {
       if (result.exists) {
-        query.push("WITH " + note.title + "");
+        query.push("WITH n");
         query.push(
           "MATCH (" +
             note.tags[i] +
@@ -47,12 +47,8 @@ async function makeNote(note, username) {
             note.tags[i] +
             ".username = $username"
         );
-        query.push(
-          "CREATE (" + note.title + ")-[:TALKS_ABOUT]->(" + note.tags[i] + ")"
-        );
-        query.push(
-          "CREATE (" + note.tags[i] + ")-[:MENTIONED_IN]->(" + note.title + ")"
-        );
+        query.push("CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i] + ")");
+        query.push("CREATE (" + note.tags[i] + ")-[:MENTIONED_IN]->(n)");
         params["tag" + i] = note.tags[i];
       } else {
         query.push(
@@ -73,7 +69,7 @@ async function makeNote(note, username) {
       }
     });
   }
-  query.push("RETURN id(" + note.title + ")");
+  query.push("RETURN id(n)");
 
   // console.log(query);
   // console.log(params);
@@ -140,7 +136,14 @@ async function editNote(type, id, note, username) {
       .catch(err => {
         throw err;
       });
-    var stats = {updateTags: updateTags, firstquery: '', secondquery: '', firstqueryparams: '', secondqueryparams: '' };
+    // console.log(updateTags);
+    var stats = {
+      updateTags: updateTags,
+      firstquery: "",
+      secondquery: "",
+      firstqueryparams: "",
+      secondqueryparams: ""
+    };
     var query = [];
     var params = {};
     params["username"] = username;
@@ -169,7 +172,10 @@ async function editNote(type, id, note, username) {
         .run(query.join(" "), params)
         .then(result => {
           session.close();
-          stats.updateStats = Object.assign({},result.summary.updateStatistics._stats);
+          stats.updateStats = Object.assign(
+            {},
+            result.summary.updateStatistics._stats
+          );
         })
         .catch(error => {
           session.close();
@@ -228,8 +234,13 @@ async function editNote(type, id, note, username) {
         .then(result => {
           session.close();
           for (key in result.summary.updateStatistics._stats) {
-            if (typeof stats.updateStats !== 'undefined' &&  key in stats.updateStats) {
-              stats.updateStats[key] = stats.updateStats[key] + result.summary.updateStatistics._stats[key];
+            if (
+              typeof stats.updateStats !== "undefined" &&
+              key in stats.updateStats
+            ) {
+              stats.updateStats[key] =
+                stats.updateStats[key] +
+                result.summary.updateStatistics._stats[key];
             }
           }
         })
@@ -238,6 +249,7 @@ async function editNote(type, id, note, username) {
           throw error;
         });
     }
+    // console.log(stats);
     return stats;
   }
 }
@@ -327,17 +339,34 @@ function searchNotesTag(query) {
     });
 }
 
-//  ---------- custom middleware create
+//  ---------- custom middleware create & cors
+var originsWhitelist = [
+  "http://localhost:3000" //this is my front-end url for development
+];
+var corsOptions = {
+  origin: function(origin, callback) {
+    console.log("hi", origin);
+    if (originsWhitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+};
+
 let secretKey = "super secert key";
 const AuthMiddleWare = (req, res, next) => {
-  let key =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOnRydWUsImV4cCI6MTU5MDE3OTgzN30.b2rlviAXMwsEKbbkyVXrlRTIqu2yZtUcRxgPaeQ7NVg";
-
+  let key;
+  if (typeof req.headers.authorization === "undefined") {
+    key =
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOmZhbHNlLCJleHAiOjE3MTEyNjQzNDZ9.Wyvk3K-nmax4PDRS2yb35VhFunpsyMy8xTVVEvUwEqg";
+  } else {
+    key = req.headers.authorization.split(" ")[1];
+  }
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   nJwt.verify(key, secretKey, function(err, token) {
-    // req.body.accessToken
-    // console.log(req.body.access_token);
     if (err) {
-      // respond to request with error
       console.log(err);
       res.status(400).json({ error: "authorization required" });
     } else {
@@ -349,56 +378,67 @@ const AuthMiddleWare = (req, res, next) => {
 // ------- methods ----
 var router = express.Router();
 app.use(express.json());
+app.options("*", cors({ corsOptions }));
 app.use(AuthMiddleWare);
-// add note add here
-app.use("/", router);
+app.use("/notesapp", router);
 
 // notes routes, all require auth
 // create a note, data will be json {title, text, username, tags: [string array]}
 router.post("/makenote", (req, res) => {
-  makeNote(req.body, req.token.username)
-    .then(results => {
-      let str =
-        Date.now().toString() +
-        " " + results.records[0].get(0).toNumber() + " " +
-        JSON.stringify(results.summary.updateStatistics._stats) +
-        "\n";
-      fs.appendFile("noteMakeLog.txt", str, function(err) {
-        if (err) {
-          console.log(err);
-        }
+  if (req.token.authenticated) {
+    makeNote(req.body.note, req.token.username)
+      .then(results => {
+        let str =
+          Date.now().toString() +
+          " " +
+          results.records[0].get(0).toNumber() +
+          " " +
+          JSON.stringify(results.summary.updateStatistics._stats) +
+          "\n";
+        fs.appendFile("noteMakeLog.txt", str, function(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+        res.status(201).json({
+          message: "note created",
+          noteid: results.records[0].get(0).toNumber()
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(400).json({ error: err.toString() });
       });
-      res.status(201).json({
-        message: "note created",
-        noteid: results.records[0].get(0).toNumber()
-      });
-    })
-    .catch(err => {
-      res.status(400).json({ error: err.toString() });
-    });
+  } else {
+    res.status(400).json({ error: "must sign in to create a note" });
+  }
 });
 
 // user can edit text, tags, or title of their note
 router.put("/editnote/:id", (req, res) => {
   console.log("params + body ", req.params, req.body);
-  let stats = editNote(
-    req.body.type,
-    req.params.id,
-    req.body.note,
-    req.token.username
-  )
-    .then(r => {
-      let str = Date.now().toString() + " " + JSON.stringify(r) + "\n";
-      fs.appendFile("noteEditLog.txt", str, function(err) {
-        if (err) {
-          console.log(err);
-        }
+  if (req.token.authenticated) {
+    let stats = editNote(
+      req.body.type,
+      req.params.id,
+      req.body.note,
+      req.token.username
+    )
+      .then(r => {
+        let str = Date.now().toString() + " " + JSON.stringify(r) + "\n";
+        fs.appendFile("noteEditLog.txt", str, function(err) {
+          if (err) {
+            console.log(err);
+          }
+        });
+        res.status(200).json({ message: "edit complete" });
+      })
+      .catch(err => {
+        res.status(400).json({ message: err.toString() });
       });
-      res.status(200).json({ message: "edit complete" });
-    })
-    .catch(err => {
-      res.status(400).json({ message: err.toString() });
-    });
+  } else {
+    res.status(400).json({ error: "must sign in to edit a note" });
+  }
 });
 
 // retrieve all notes specificed by params {lookupBy, lookupField}
@@ -407,15 +447,17 @@ router.put("/editnote/:id", (req, res) => {
 //  search by text of doc
 // curl localhost:8100/searchnotes?lookupBy=tag&lookupField=startup
 router.get("/searchnotes", (req, res) => {
+  console.log(req.query);
   if (req.query.lookupBy === "tag") {
     searchNotesTag({ tag: req.query.lookupField, username: req.token.username })
       .then(records => {
-        arrayofnodes = {};
+        dictofnodes = {};
         records.forEach(record => {
-          if (arrayofnodes[record.get(0).toString()]) {
-            arrayofnodes[record.get(0).toString()].tags.push(record.get(3));
+          // if record/ note exists add to its array of tags
+          if (dictofnodes[record.get(0).toString()]) {
+            dictofnodes[record.get(0).toString()].tags.push(record.get(3));
           } else {
-            arrayofnodes[record.get(0).toString()] = {
+            dictofnodes[record.get(0).toString()] = {
               id: record.get(0).toNumber(),
               title: record.get(1),
               text: record.get(2),
@@ -423,6 +465,10 @@ router.get("/searchnotes", (req, res) => {
             };
           }
         });
+        arrayofnodes = [];
+        for (let key in dictofnodes) {
+          arrayofnodes.push(dictofnodes[key]);
+        }
         res
           .status(200)
           .json({ message: "search completed", notes: arrayofnodes });
@@ -456,8 +502,10 @@ router.get("/getTagsList", (req, res) => {
 // user wants to delete a note
 router.delete("/deletenote", (req, res) => {
   console.log(req.body);
-  // makeNote();
-  res.send("created note");
+  if (req.token.authenticated) {
+  } else {
+    res.status(400).json({ error: "must sign in to delete a note" });
+  }
 });
 
 const PORT = 8100;

@@ -8,3 +8,39 @@
 1590115509947 {"updateTags":{"remove":[],"add":["timb"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":4},"secondqueryparams":{"username":"con","id":4,"tag0":"timb","tagnum0":201}}
 1590115524113 {"updateTags":{"remove":["timb","new2"],"add":["newnew","new"]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel","WITH true as pass","MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag1, username: $username}) DELETE rel"],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum2 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)","WITH true as pass","MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum3 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":4,"tag0":"timb","tag1":"new2"},"secondqueryparams":{"username":"con","id":4,"tag2":"newnew","tagnum2":0,"tag3":"new","tagnum3":33},"updateStats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":4,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0}}
 1590115637381 {"updateTags":{"remove":["newnew","new"],"add":["new2","timb"]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel","WITH true as pass","MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag1, username: $username}) DELETE rel"],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum2 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)","WITH true as pass","MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum3 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":4,"tag0":"newnew","tag1":"new"},"secondqueryparams":{"username":"con","id":4,"tag2":"new2","tagnum2":185,"tag3":"timb","tagnum3":201},"updateStats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":4,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0}}
+1590126208943 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1590126213995 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1590126235226 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1590126298096 undefined
+1590197369086 undefined
+1590197408249 undefined
+1590198304767 undefined
+1590198323782 undefined
+1590198335809 undefined
+1590198346417 undefined
+1590198360537 undefined
+1590198389045 undefined
+1590198416558 undefined
+1590198592129 undefined
+1590198596756 undefined
+1590198771234 undefined
+1590198805147 undefined
+1590198843402 undefined
+1590198883981 undefined
+1590198895543 {"updateTags":{"remove":["node"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"con","id":204,"tag0":"node"},"secondqueryparams":{"username":"con","id":204}}
+1590198911110 undefined
+1590198957664 undefined
+1590198964768 {"updateTags":{"remove":[],"add":["node"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":204},"secondqueryparams":{"username":"con","id":204,"tag0":"node","tagnum0":7}}
+1590199190093 undefined
+1590199248567 undefined
+1590199333119 undefined
+1590199375112 undefined
+1590199633075 undefined
+1590199642188 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1590199736372 undefined
+1590199754344 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1590199822936 undefined
+1590199876869 undefined
+1590199879420 undefined
+1590199899840 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1590200002340 undefined
