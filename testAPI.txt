@@ -1,11 +1,11 @@
-curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"], "username": "con"}' --header "Content-Type: application/json" localhost:8100/makenote -w "\n"
-curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"]}' --header "Content-Type: application/json" localhost:8100/makenote -w "\n"
+curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"], "username": "con"}' --header "Content-Type: application/json" localhost:8100/notesapp/makenote -w "\n"
+curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"]}' --header "Content-Type: application/json" localhost:8100/notesapp/makenote -w "\n"
 
-curl 'localhost:8100/searchnotes?lookupField=startup&lookupBy=tag'
-curl 'localhost:8100/searchnotes?lookupField=startup&lookupBy=tag&username=bilol'
+curl 'localhost:8100/notesapp/searchnotes?lookupField=startup&lookupBy=tag'
+curl 'localhost:8100/notesapp/searchnotes?lookupField=startup&lookupBy=tag&username=bilol'
 
-curl -X PUT -d '{"type":"tag", "note":{ "title":"haemailtype is cool","text":"hi","tags":["startup","win"]}}' --header "Content-Type: application/json" localhost:8100/editnote/5
-curl -X PUT -d '{"type":"text", "note":{ "title":"haemailtype is cool","text":"hi","tags":["startup","win"]}}' --header "Content-Type: application/json" localhost:8100/editnote/46
-curl -X PUT -d '{"type":"tag", "note":{ "title":"haemailtype is cool","text":"hi","tags":["ten","win"]}}' --header "Content-Type: application/json" localhost:8100/editnote/46
+curl -X PUT -d '{"type":"tag", "note":{ "title":"haemailtype is cool","text":"hi","tags":["startup","win"]}}' --header "Content-Type: application/json" localhost:8100/notesapp/editnote/5
+curl -X PUT -d '{"type":"text", "note":{ "title":"haemailtype is cool","text":"hi","tags":["startup","win"]}}' --header "Content-Type: application/json" localhost:8100/notesapp/editnote/46
+curl -X PUT -d '{"type":"tag", "note":{ "title":"haemailtype is cool","text":"hi","tags":["ten","win"]}}' --header "Content-Type: application/json" localhost:8100/notesapp/editnote/46
 
 curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://www.example.com
