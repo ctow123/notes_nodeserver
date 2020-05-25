@@ -59,10 +59,10 @@ async function makeNote(note, username) {
             ", username: $username})"
         );
         query.push(
-          "CREATE (" + note.title + ")-[:TALKS_ABOUT]->(" + note.tags[i] + ")"
+          "CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i] + ")"
         );
         query.push(
-          "CREATE (" + note.tags[i] + ")-[:MENTIONED_IN]->(" + note.title + ")"
+          "CREATE (" + note.tags[i] + ")-[:MENTIONED_IN]->(n)"
         );
         params["tag" + i] = note.tags[i];
         tags.push("t" + i);
