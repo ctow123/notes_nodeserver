@@ -77,7 +77,7 @@ async function makeNote(note, username) {
     .run(query.join(" "), params)
     .then(result => {
       session.close();
-      console.log(result.records[0].get(0).toNumber());
+      // console.log(result.records[0].get(0).toNumber());
       return result;
     })
     .catch(error => {
@@ -515,4 +515,7 @@ const HOST = "0.0.0.0";
 app.listen(PORT, () =>
   console.log(`Example app listening at http://${HOST}:${PORT}`)
 );
-module.exports = app;
+module.exports = {
+  app: app,
+  driver: driver
+}
