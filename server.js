@@ -31,38 +31,36 @@ async function makeNote(note, username) {
   params.username = username;
   params.date = Date.now();
   for (let i = 0; i < note.tags.length; i++) {
-    // turn on if hashtags
-    // note.tags[i] = note.tags[i].substring(1);
     await getTag(note.tags[i], username).then(result => {
       if (result.exists) {
         query.push("WITH n");
         query.push(
           "MATCH (" +
-            note.tags[i] +
+            note.tags[i].replace(/ /g,'') +
             ":Tag) WHERE " +
-            note.tags[i] +
+            note.tags[i].replace(/ /g,'') +
             ".tag in {tag" +
             i +
             "} AND " +
-            note.tags[i] +
+            note.tags[i].replace(/ /g,'') +
             ".username = $username"
         );
-        query.push("CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i] + ")");
-        query.push("CREATE (" + note.tags[i] + ")-[:MENTIONED_IN]->(n)");
+        query.push("CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i].replace(/ /g,'') + ")");
+        query.push("CREATE (" + note.tags[i].replace(/ /g,'') + ")-[:MENTIONED_IN]->(n)");
         params["tag" + i] = note.tags[i];
       } else {
         query.push(
           "CREATE (" +
-            note.tags[i] +
+            note.tags[i].replace(/ /g,'') +
             ":Tag {tag: $tag" +
             i +
             ", username: $username})"
         );
         query.push(
-          "CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i] + ")"
+          "CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i].replace(/ /g,'') + ")"
         );
         query.push(
-          "CREATE (" + note.tags[i] + ")-[:MENTIONED_IN]->(n)"
+          "CREATE (" + note.tags[i].replace(/ /g,'') + ")-[:MENTIONED_IN]->(n)"
         );
         params["tag" + i] = note.tags[i];
         tags.push("t" + i);
@@ -71,8 +69,6 @@ async function makeNote(note, username) {
   }
   query.push("RETURN id(n)");
 
-  // console.log(query);
-  // console.log(params);
   return session
     .run(query.join(" "), params)
     .then(result => {
@@ -87,6 +83,16 @@ async function makeNote(note, username) {
 }
 
 // edit the title, text, or tags of a note
+// returns a promise on success it will have stats
+/*     var stats = {
+      updateTags: updateTags,
+      firstquery: "",
+      secondquery: "",
+      firstqueryparams: "",
+      secondqueryparams: "",
+      updateStats
+    };
+*/
 async function editNote(type, id, note, username) {
   let add;
   let remove;
@@ -161,7 +167,7 @@ async function editNote(type, id, note, username) {
         }
         params["tag" + i] = item;
       } catch (error) {
-        console.log("error" + error);
+        console.log("error " + error);
       }
     }
     stats.firstquery = query;
@@ -254,6 +260,12 @@ async function editNote(type, id, note, username) {
   }
 }
 
+
+// comparing the note to last save and updating the changes
+async function editNoteClose(){
+
+}
+
 // get all tags assocaited with a note for a user
 function getTagsForNote(noteid, username) {
   var session = driver.session();
@@ -299,11 +311,29 @@ function getTag(tag, username) {
     });
 }
 
-// get all tags associated with a username
+// get all tags associated with a username, and number of times each tag is mentioned
 function getTags(username) {
   var session = driver.session();
   return session
-    .run("MATCH (n:Tag) WHERE n.username = {username} RETURN n.tag", {
+    .run("MATCH (n:Tag) WHERE n.username = {username} WITH n MATCH (n)-[r:MENTIONED_IN]->() RETURN n.tag, COUNT(r)", {
+      username: username
+    })
+    .then(result => {
+      session.close();
+      return result.records;
+    })
+    .catch(error => {
+      session.close();
+      throw error;
+    });
+}
+
+
+// get all title of notes associated with a username
+function getTitles(username) {
+  var session = driver.session();
+  return session
+    .run("MATCH (n:Note) WHERE n.username = {username} RETURN n.title, n.dateupdated", {
       username: username
     })
     .then(result => {
@@ -337,6 +367,67 @@ function searchNotesTag(query) {
       session.close();
       throw error;
     });
+}
+
+// implements search using neo4j's fulltext indexing
+function smartSearch(query){
+  var session = driver.session();
+  return session
+    .run(
+      "CALL db.index.fulltext.queryNodes('smartSearch', {term}) YIELD node, score \
+       WITH node, score \
+       MATCH (n:Note {username: {username}}) WHERE id(n)=id(node) MATCH (n)-[rel:TALKS_ABOUT]-(p:Tag) \
+       RETURN id(node), node.title, node.text, collect(p.tag) as tags, score",
+      {
+        term: query.term,
+        username: query.username
+      }
+    )
+    .then(result => {
+      session.close();
+      return result.records;
+    })
+    .catch(error => {
+      session.close();
+      throw error;
+    });
+}
+
+// recommend tags for a note based on tags that notes sharing its current tags talk about
+async function recommendedTags(id, username){
+  var session = driver.session();
+  let results = await session
+    .run("MATCH (n:Note {username: {username}}) WHERE ID(n)={noteid} WITH n MATCH (n)-[:TALKS_ABOUT*3]-(t2:Tag) \
+         RETURN distinct(t2.tag)", {
+      noteid: parseInt(id),
+      username: username
+    })
+    .then(result => {
+      session.close();
+      return result;
+    })
+    .catch(error => {
+      session.close();
+      throw error;
+    });
+  return  results;
+}
+
+async function deleteNote(id){
+  var session = driver.session();
+  let stats = await session
+    .run("MATCH (n:Note) WHERE id(n)={noteid} DETACH DELETE n", {
+      noteid: parseInt(id),
+    })
+    .then(result => {
+      session.close();
+      return result;
+    })
+    .catch(error => {
+      session.close();
+      throw error;
+    });
+  return  stats.summary.updateStatistics;
 }
 
 //  ---------- custom middleware create & cors
@@ -383,18 +474,19 @@ app.use(AuthMiddleWare);
 app.use("/notesapp", router);
 
 // notes routes, all require auth
-// create a note, data will be json {title, text, username, tags: [string array]}
+// create a note adnd returns the id of the created note to user or error message
 router.post("/makenote", (req, res) => {
   if (req.token.authenticated) {
     makeNote(req.body.note, req.token.username)
       .then(results => {
-        let str =
-          Date.now().toString() +
+        let str = Date.now().toString() + " ";
+        req.token.username +
           " " +
           results.records[0].get(0).toNumber() +
           " " +
-          JSON.stringify(results.summary.updateStatistics._stats) +
-          "\n";
+          req.body.note +
+          " ";
+        JSON.stringify(results.summary.updateStatistics._stats) + "\n";
         fs.appendFile("noteMakeLog.txt", str, function(err) {
           if (err) {
             console.log(err);
@@ -410,13 +502,15 @@ router.post("/makenote", (req, res) => {
         res.status(400).json({ error: err.toString() });
       });
   } else {
-    res.status(400).json({ error: "must sign in to create a note" });
+    res.status(401).json({ error: "must sign in to create a note" });
   }
 });
 
-// user can edit text, tags, or title of their note
+
+
+
+// user can edit text, tags, or title of their note ... conflicts resolved by dateupdated
 router.put("/editnote/:id", (req, res) => {
-  console.log("params + body ", req.params, req.body);
   if (req.token.authenticated) {
     let stats = editNote(
       req.body.type,
@@ -425,7 +519,15 @@ router.put("/editnote/:id", (req, res) => {
       req.token.username
     )
       .then(r => {
-        let str = Date.now().toString() + " " + JSON.stringify(r) + "\n";
+        let str =
+          Date.now().toString() +
+          " " +
+          req.token.username +
+          " " +
+          req.body.type +
+          " " +
+          JSON.stringify(r) +
+          "\n";
         fs.appendFile("noteEditLog.txt", str, function(err) {
           if (err) {
             console.log(err);
@@ -437,10 +539,9 @@ router.put("/editnote/:id", (req, res) => {
         res.status(400).json({ message: err.toString() });
       });
   } else {
-    res.status(400).json({ error: "must sign in to edit a note" });
+    res.status(401).json({ error: "must sign in to edit a note" });
   }
 });
-
 // retrieve all notes specificed by params {lookupBy, lookupField}
 // lookupBy: title, tag (only supported), date & lookupField: input
 // longerterm input a word/phrase and intelligently search by all of the above
@@ -481,17 +582,62 @@ router.get("/searchnotes", (req, res) => {
   } else if (req.query.lookupBy === "date") {
     res.status(200).json({ message: "search completed" });
   } else {
-    // smart search
-    res.status(200).json({ message: "search completed" });
+    smartSearch({ term: req.query.lookupField, username: req.token.username })
+      .then(records => {
+        arrayofnodes = [];
+        records.forEach(record => {
+          arrayofnodes.push({
+            id: record.get(0).toNumber(),
+            title: record.get(1),
+            text: record.get(2),
+            tags: record.get(3),
+            score: record.get(4)
+          });
+        });
+        res.status(200).json({ message: "search completed" , notes: arrayofnodes});
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
   }
 });
+
 
 // get list of all possible tags for a user
 router.get("/getTagsList", (req, res) => {
   getTags(req.token.username)
     .then(tags => {
       tagsarray = [];
+      tagscount = {};
       tags.forEach(tag => tagsarray.push(tag.get(0)));
+      tags.forEach(tag => tagscount[tag.get(0)] = tag.get(1).toNumber())
+      res.status(200).json({ tags: tagsarray, tagsCount: tagscount });
+    })
+    .catch(err => {
+      res.status(400).json({ error: err.toString() });
+    });
+});
+
+// get list of all possible note titles for a user
+router.get("/getTitlesList", (req, res) => {
+  getTitles(req.token.username)
+    .then(titles => {
+      titlearray = [];
+      titles.forEach(title => titlearray.push({title: title.get(0), date: title.get(1)}));
+      res.status(200).json({ titles: titlearray });
+    })
+    .catch(err => {
+      res.status(400).json({ error: err.toString() });
+    });
+});
+
+// get recommended tags for a note you make
+router.get("/getRecommendTags", (req, res) => {
+    recommendedTags(req.query.id, req.token.username)
+    .then(results => {
+      console.log(results.records);
+      tagsarray = [];
+      results.records.forEach(record => tagsarray.push(record.get(0)));
       res.status(200).json({ tags: tagsarray });
     })
     .catch(err => {
@@ -500,13 +646,21 @@ router.get("/getTagsList", (req, res) => {
 });
 
 // user wants to delete a note
-router.delete("/deletenote", (req, res) => {
+router.delete("/deletenote/:id", (req, res) => {
   console.log(req.body);
   if (req.token.authenticated) {
+    deleteNote(req.params.id)
+      .then(result => {
+        res.status(200).json({ message: result });
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
   } else {
-    res.status(400).json({ error: "must sign in to delete a note" });
+    res.status(401).json({ error: "must sign in to delete a note" });
   }
 });
+
 
 const PORT = 8100;
 const HOST = "0.0.0.0";
@@ -515,6 +669,7 @@ const HOST = "0.0.0.0";
 app.listen(PORT, () =>
   console.log(`Example app listening at http://${HOST}:${PORT}`)
 );
+
 module.exports = {
   app: app,
   driver: driver

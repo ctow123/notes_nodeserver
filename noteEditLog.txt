@@ -11,55 +11,34 @@
 1590126208943 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
 1590126213995 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
 1590126235226 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
-1590126298096 undefined
-1590197369086 undefined
-1590197408249 undefined
-1590198304767 undefined
-1590198323782 undefined
-1590198335809 undefined
-1590198346417 undefined
-1590198360537 undefined
-1590198389045 undefined
-1590198416558 undefined
-1590198592129 undefined
-1590198596756 undefined
-1590198771234 undefined
-1590198805147 undefined
-1590198843402 undefined
-1590198883981 undefined
-1590198895543 {"updateTags":{"remove":["node"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"con","id":204,"tag0":"node"},"secondqueryparams":{"username":"con","id":204}}
-1590198911110 undefined
-1590198957664 undefined
-1590198964768 {"updateTags":{"remove":[],"add":["node"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":204},"secondqueryparams":{"username":"con","id":204,"tag0":"node","tagnum0":7}}
-1590199190093 undefined
-1590199248567 undefined
-1590199333119 undefined
-1590199375112 undefined
-1590199633075 undefined
-1590199642188 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
-1590199736372 undefined
-1590199754344 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
-1590199822936 undefined
-1590199876869 undefined
-1590199879420 undefined
-1590199899840 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
-1590200002340 undefined
-1590458668352 {"updateTags":{"remove":["node"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"con","id":1,"tag0":"node"},"secondqueryparams":{"username":"con","id":1}}
-1590458680605 undefined
-1590458826416 {"updateTags":{"remove":[],"add":["node"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":1},"secondqueryparams":{"username":"con","id":1,"tag0":"node","tagnum0":7}}
-1590459129572 undefined
-1590459133451 {"updateTags":{"remove":["node"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"con","id":1,"tag0":"node"},"secondqueryparams":{"username":"con","id":1}}
-1590459251779 undefined
-1590459351583 undefined
-1590459356399 {"updateTags":{"remove":[],"add":["node"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":1},"secondqueryparams":{"username":"con","id":1,"tag0":"node","tagnum0":7}}
-1590459383074 {"updateTags":{"remove":["node"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"con","id":1,"tag0":"node"},"secondqueryparams":{"username":"con","id":1}}
-1590459389905 {"updateTags":{"remove":[],"add":["node"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":1},"secondqueryparams":{"username":"con","id":1,"tag0":"node","tagnum0":7}}
-1590459400860 {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
-1590459410595 undefined
-1590459667286 undefined
 1590464787859 undefined
 1590464826653 undefined
 1590464845311 undefined
 1590464849003 undefined
 1590465310543 undefined
 1590465381539 undefined
+1591763201933 con tag {"updateTags":{"remove":[],"add":["ok"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"con","id":1},"secondqueryparams":{"username":"con","id":1,"tag0":"ok"}}
+1591763245709 con close undefined
+1591763248336 con tag {"updateTags":{"remove":["ok"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"con","id":1,"tag0":"ok"},"secondqueryparams":{"username":"con","id":1}}
+1592073613416 con title {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1592073614658 con text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":0,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1592073809833 con close undefined
+1592073825455 con close undefined
+1592073922824 con close undefined
+1592073948303 con tags undefined
+1592073948448 con text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1592073949701 con close undefined
+1592073963964 con tag {"updateTags":{"remove":[],"add":["one"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"con","id":248},"secondqueryparams":{"username":"con","id":248,"tag0":"one"}}
+1592073966102 con close undefined
+1592103528346 con tags undefined
+1592103528775 con text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1592103529981 con close undefined
+1592103548843 con tag {"updateTags":{"remove":[],"add":["one"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"con","id":26},"secondqueryparams":{"username":"con","id":26,"tag0":"one","tagnum0":8}}
+1592103551558 con close undefined
+1592103573389 con tag {"updateTags":{"remove":[],"add":["two"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"con","id":27},"secondqueryparams":{"username":"con","id":27,"tag0":"two"}}
+1592103721213 con tag {"updateTags":{"remove":[],"add":["anotha tag"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"con","id":26},"secondqueryparams":{"username":"con","id":26,"tag0":"anotha tag"}}
+1592103723143 con close undefined
+1592107062487 con close undefined
+1592107081094 con close undefined
+1592108333504 con close undefined
+1592108343284 con close undefined
