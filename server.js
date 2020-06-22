@@ -328,6 +328,57 @@ function getTags(username) {
     });
 }
 
+function pairwise(list) {
+  if (list.length < 2) {
+    return [];
+  }
+  var first = list[0],
+    rest = list.slice(1),
+    pairs = rest.map(function(x) {
+      return [first, x];
+    });
+  return pairs.concat(pairwise(rest));
+}
+
+// get the weights for the paths between tag nodes
+async function getPathWeights(username) {
+  let tagpairs = await getTags(username)
+    .then(tags => {
+      tagsarray = [];
+      tags.forEach(tag => tagsarray.push(tag.get(0)));
+      return tagsarray;
+    })
+    .catch(err => {
+      console.log(err.toString());
+    });
+  let pathsweights = [];
+// await the array of promises
+  await Promise.all(pairwise(tagpairs).map(async (pair) => {
+      var session = driver.session();
+    await session
+      .run(
+        "MATCH (n:Tag {tag: $pairone, username: $username})-[r:MENTIONED_IN*2]-(t2:Tag {tag: $pairtwo, username: $username}) RETURN count(r)",
+        {
+        pairone: pair[0],
+        pairtwo: pair[1],
+        username: username
+        }
+      )
+      .then(result => {
+        session.close();
+        pathsweights.push({key: pair[0]+ '][' +pair[1],value: result.records[0].get(0).toNumber() })
+        // console.log(result.records[0].get(0).toNumber());
+      })
+      .catch(error => {
+        session.close();
+        throw error;
+      });
+  }))
+  return pathsweights
+}
+
+
+
 
 // get all title of notes associated with a username
 function getTitles(username) {
@@ -625,6 +676,17 @@ router.get("/getTitlesList", (req, res) => {
       titlearray = [];
       titles.forEach(title => titlearray.push({title: title.get(0), date: title.get(1)}));
       res.status(200).json({ titles: titlearray });
+    })
+    .catch(err => {
+      res.status(400).json({ error: err.toString() });
+    });
+});
+
+// get the weights between the paths of tags
+router.get("/getPathWeights", (req, res) => {
+  getPathWeights(req.token.username)
+    .then(weights => {
+      res.status(200).json({ weights: weights });
     })
     .catch(err => {
       res.status(400).json({ error: err.toString() });
