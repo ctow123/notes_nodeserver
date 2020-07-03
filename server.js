@@ -341,8 +341,9 @@ function pairwise(list) {
 }
 
 // get the weights for the paths between tag nodes
-async function getPathWeights(username) {
-  let tagpairs = await getTags(username)
+// getPathWeights rewrite for speed
+async function getPathWeights2(username){
+  let tags = await getTags(username)
     .then(tags => {
       tagsarray = [];
       tags.forEach(tag => tagsarray.push(tag.get(0)));
@@ -352,33 +353,36 @@ async function getPathWeights(username) {
       console.log(err.toString());
     });
   let pathsweights = [];
-// await the array of promises
-  await Promise.all(pairwise(tagpairs).map(async (pair) => {
-      var session = driver.session();
-    await session
-      .run(
-        "MATCH (n:Tag {tag: $pairone, username: $username})-[r:MENTIONED_IN*2]-(t2:Tag {tag: $pairtwo, username: $username}) RETURN count(r)",
-        {
-        pairone: pair[0],
-        pairtwo: pair[1],
-        username: username
-        }
-      )
-      .then(result => {
-        session.close();
-        pathsweights.push({key: pair[0]+ '][' +pair[1],value: result.records[0].get(0).toNumber() })
-        // console.log(result.records[0].get(0).toNumber());
-      })
-      .catch(error => {
-        session.close();
-        throw error;
-      });
-  }))
-  return pathsweights
+  let pathsweightsdict = {}
+  // await the array of promises
+    await Promise.all(tags.map(async (tag) => {
+        var session = driver.session();
+      await session
+        .run(
+          "MATCH (n:Tag {tag: $pairone, username: $username})-[r:MENTIONED_IN*2]-(t2:Tag {username: $username}) RETURN n.tag,t2.tag, count(r)",
+          {
+          pairone: tag,
+          username: username
+          }
+        )
+        .then(results => {
+          session.close();
+          (results.records).forEach( (item, index) => {
+            if(pathsweightsdict[results.records[index].get(1) + '][' + results.records[index].get(0)]){
+              pathsweightsdict[results.records[index].get(1) + '][' + results.records[index].get(0)] += results.records[index].get(2).toNumber()
+            }
+            else{
+            pathsweightsdict[results.records[index].get(0) + '][' + results.records[index].get(1)] = results.records[index].get(2).toNumber()
+          }
+          })
+        })
+        .catch(error => {
+          session.close();
+          throw error;
+        });
+    }))
+    return [pathsweightsdict]
 }
-
-
-
 
 // get all title of notes associated with a username
 function getTitles(username) {
@@ -684,7 +688,7 @@ router.get("/getTitlesList", (req, res) => {
 
 // get the weights between the paths of tags
 router.get("/getPathWeights", (req, res) => {
-  getPathWeights(req.token.username)
+  getPathWeights2(req.token.username)
     .then(weights => {
       res.status(200).json({ weights: weights });
     })
