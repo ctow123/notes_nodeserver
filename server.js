@@ -660,7 +660,8 @@ router.get("/searchnotes", (req, res) => {
 
 // get list of all possible tags for a user
 router.get("/getTagsList", (req, res) => {
-  getTags(req.token.username)
+  let user = typeof req.query.username !== "undefined" ? req.query.username : req.token.username
+  getTags(user)
     .then(tags => {
       tagsarray = [];
       tagscount = {};
@@ -688,7 +689,8 @@ router.get("/getTitlesList", (req, res) => {
 
 // get the weights between the paths of tags
 router.get("/getPathWeights", (req, res) => {
-  getPathWeights2(req.token.username)
+  let user = typeof req.query.username !== "undefined" ? req.query.username : req.token.username
+  getPathWeights2(user)
     .then(weights => {
       res.status(200).json({ weights: weights });
     })

@@ -49,4 +49,4 @@
 1590439302773 27 {"nodesCreated":1,"nodesDeleted":0,"relationshipsCreated":6,"relationshipsDeleted":0,"propertiesSet":5,"labelsAdded":1,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0}
 1590439327286 241 {"nodesCreated":1,"nodesDeleted":0,"relationshipsCreated":6,"relationshipsDeleted":0,"propertiesSet":5,"labelsAdded":1,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0}
 1590439345190 28 {"nodesCreated":1,"nodesDeleted":0,"relationshipsCreated":6,"relationshipsDeleted":0,"propertiesSet":5,"labelsAdded":1,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0}
-1592073930249 1592103513344 1592103563530 
+1592073930249 1592103513344 1592103563530 1593755597850 1593816064319 1593816093528 1593816114514 1593816132460 1593816183507 
