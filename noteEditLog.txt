@@ -44,3 +44,40 @@
 1592108343284 con close undefined
 1593312831926 connor.towler@gmail.com close undefined
 1593312960431 connor.towler@gmail.com close undefined
+1593755585768 con close undefined
+1593755631106 con close undefined
+1593755635481 con close undefined
+1593755639035 con close undefined
+1593816065427 AOC tag {"updateTags":{"remove":[],"add":["politics"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":224},"secondqueryparams":{"username":"AOC","id":224,"tag0":"politics"}}
+1593816067767 AOC text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1593816068196 AOC tag {"updateTags":{"remove":[],"add":["AOC"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":224},"secondqueryparams":{"username":"AOC","id":224,"tag0":"AOC"}}
+1593816070909 AOC tag {"updateTags":{"remove":[],"add":["money"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":224},"secondqueryparams":{"username":"AOC","id":224,"tag0":"money"}}
+1593816073305 AOC close undefined
+1593816075001 AOC close undefined
+1593816097320 AOC tag {"updateTags":{"remove":[],"add":["friends"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":244},"secondqueryparams":{"username":"AOC","id":244,"tag0":"friends"}}
+1593816097510 AOC text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1593816101195 AOC close undefined
+1593816103363 AOC close undefined
+1593816121420 AOC text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1593816122869 AOC tag {"updateTags":{"remove":[],"add":["politics"]},"firstquery":[],"secondquery":["MATCH (a:Note),(b:Tag) WHERE id(a)={id} AND id(b)=$tagnum0 WITH a,b CREATE (a)-[:TALKS_ABOUT]->(b) CREATE (b)-[:MENTIONED_IN]->(a)"],"firstqueryparams":{"username":"AOC","id":1},"secondqueryparams":{"username":"AOC","id":1,"tag0":"politics","tagnum0":241}}
+1593816125686 AOC close undefined
+1593816145695 AOC text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1593816149931 AOC tag {"updateTags":{"remove":[],"add":["Shapiro"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":2},"secondqueryparams":{"username":"AOC","id":2,"tag0":"Shapiro"}}
+1593816151233 AOC tag {"updateTags":{"remove":[],"add":["Debates"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":2},"secondqueryparams":{"username":"AOC","id":2,"tag0":"Debates"}}
+1593816152967 AOC close undefined
+1593816156183 AOC close undefined
+1593816158623 AOC close undefined
+1593816159459 AOC close undefined
+1593816169572 AOC close undefined
+1593816174656 AOC close undefined
+1593816192278 AOC tag {"updateTags":{"remove":[],"add":["billionaries"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":33},"secondqueryparams":{"username":"AOC","id":33,"tag0":"billionaries"}}
+1593816192341 AOC text {"_stats":{"nodesCreated":0,"nodesDeleted":0,"relationshipsCreated":0,"relationshipsDeleted":0,"propertiesSet":1,"labelsAdded":0,"labelsRemoved":0,"indexesAdded":0,"indexesRemoved":0,"constraintsAdded":0,"constraintsRemoved":0},"_systemUpdates":0}
+1593816197524 AOC close undefined
+1593816201901 AOC tag {"updateTags":{"remove":["default tag"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"AOC","id":2,"tag0":"default tag"},"secondqueryparams":{"username":"AOC","id":2}}
+1593816204093 AOC tag {"updateTags":{"remove":["default tag"],"add":[]},"firstquery":["MATCH (n:Note {username: $username}) WHERE id(n)={id} MATCH (n)-[rel]-(p:Tag {tag: $tag0, username: $username}) DELETE rel"],"secondquery":[],"firstqueryparams":{"username":"AOC","id":33,"tag0":"default tag"},"secondqueryparams":{"username":"AOC","id":33}}
+1593816206316 AOC tag {"updateTags":{"remove":[],"add":["the rich"]},"firstquery":[],"secondquery":["CREATE (tag0:Tag {tag: $tag0, username: $username})","WITH tag0","MATCH (n:Note {username: $username}) WHERE id(n)={id}","CREATE (n)-[:TALKS_ABOUT]->(tag0)","CREATE (tag0)-[:MENTIONED_IN]->(n)"],"firstqueryparams":{"username":"AOC","id":33},"secondqueryparams":{"username":"AOC","id":33,"tag0":"the rich"}}
+1593816207792 AOC close undefined
+1593816210914 AOC close undefined
+1593816214124 AOC close undefined
+1593816285989 AOC close undefined
+1593819074175 AOC close undefined
