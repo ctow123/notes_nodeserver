@@ -1,5 +1,5 @@
 curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"], "username": "con"}' --header "Content-Type: application/json" localhost:8100/notesapp/makenote -w "\n"
-curl -X POST -d '{"title":"buck2","text":"da.joker@gmail.com", "tags": ["#startup", "#win", "#node"]}' --header "Content-Type: application/json" localhost:8100/notesapp/makenote -w "\n"
+curl -X POST -d '{"note":{"title":"buck2","text":"da.joker@gmail.com", "tags": ["startup", "win", "node"], "type":"tweet"},"username": "con"}' --header "Content-Type: application/json" localhost:8100/notesapp/makenote -w "\n"
 
 curl 'localhost:8100/notesapp/searchnotes?lookupField=startup&lookupBy=tag'
 curl 'localhost:8100/notesapp/searchnotes?lookupField=startup&lookupBy=tag&username=bilol'
