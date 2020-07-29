@@ -9,3 +9,4 @@ curl -X PUT -d '{"type":"text", "note":{ "title":"haemailtype is cool","text":"h
 curl -X PUT -d '{"type":"tag", "note":{ "title":"haemailtype is cool","text":"hi","tags":["ten","win"]}}' --header "Content-Type: application/json" localhost:8100/notesapp/editnote/46
 
 curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://www.example.com
+curl -H  "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOnRydWUsImV4cCI6MTU5NTk4MjE2N30.gHlZQnIbCsOLfpJe8jmdJhH0zVv4ng_JIoK8CzYxCaY" localhost:8100/notesapp/export
