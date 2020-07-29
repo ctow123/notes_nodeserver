@@ -12,6 +12,7 @@ var driver = neo4j.driver(
 /* makes note, note requires data in json in the form {title, text, username, datecreated, tags: []}
 --> adding type to notes
 will autosend date created / updated
+ownership - refering to things you wrote, vs things u pulled in original thoughts?
  */
 async function makeNote(note, username) {
   var session = driver.session();
@@ -360,11 +361,30 @@ function getObjectByType(username, type) {
 
 // ---------------------------------------- BLOG RELATED QUERIES ----------------------------
 
+// ---------------------------------------- EXPORT DATA FUNCTIONS ----------------------------
+// returns all object by type (tweet, blog, note, video) for a user
+function exportData(username) {
+  var session = driver.session();
+  return session
+    .run(
+      "MATCH (a:Note) WHERE a.username = {username} OPTIONAL MATCH (a)-[:TALKS_ABOUT]->(tags) RETURN id(a), a.title, a.text, collect(tags.tag), a.link, a.ownership, a.type",
+      { username: username }
+    )
+    .then(results => {
+      session.close();
+      return results.records;
+    })
+    .catch(error => {
+      session.close();
+      throw error;
+    });
+}
+
 module.exports= {
   makeNote: makeNote,
   getObjectByType: getObjectByType,
   editNote: editNote,
   getTagsForNote: getTagsForNote,
   getTags: getTags,
-  
+ exportData: exportData
 };

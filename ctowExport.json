@@ -1,0 +1,220 @@
+{
+  "blogs": [
+    {
+      "id": 1,
+      "title": "Biotech meets Silicon Valley",
+      "text": "What is technology really? It’s principles and process. It’s a shift to an engineering mindset for relentless iteration and constant improvement; modular components that can be remixed and reused, and improvements that accrue and compound over time. Tech gives us tools beyond just software—continuous data streams to describe our health, circuits to program cells, scalpels to edit DNA, and the ability to create programmable, living medicines. Our focus is not just on the groundbreaking outputs of this shift, from novel gene and cell therapies to digital therapeutics and virtual care models, but on the underlying approach and drivers that created those breakthroughs. This is why it doesn’t work to simply tack on AI, or just insert tech into an established company. In order to re-program entire systems and re-imagine new approaches to massive challenges, whether those are biological, or man-made, you need to rethink the process from the ground up.\n",
+      "tags": [
+        "zero to one",
+        "first princples",
+        "innovation",
+        "technology",
+        "biotech"
+      ],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 26,
+      "title": "Zero to one explained",
+      "text": "Why peter thiel's question works so well. What is an idea that most disagree with you on but is actually true. Other said is what got us here won’t get us there. If you use common ideas, someone else has already used them to grow and create value so you’re using the same idea and competing with a much bigger player, you’ll probably lose. Its new and novel / unorthodox ideas that win because you escape competition / compete in a different way and play to your advantages to win. Example elon musk tesla, they have to be scrappy and innovative and focus. They can’t make cars as well as established automakers, but they can out innovate them in specific markets\n\nWhen you compete to be the best, you imitate. When you compete to be unique, you innovate. In business, multiple winners can thrive and coexist. Innovation promotes healthy economic competition and growth\n",
+      "tags": ["competition", "zero to one", "peter thiel"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 27,
+      "title": "What America means to me",
+      "text": "We are Americans. We are the pioneers. We are the pathfinders. We settled the new world, we built the modern world, and we changed history forever by embracing the eternal truth that everyone is made equal by the hand of Almighty God.\n\nAmerica is the place where anything can happen! America is the place where anyone can rise. And here, on this land, on this soil, on this continent, the most incredible dreams come true!\n\nThis Nation is our canvas, and this country is our masterpiece. We look at tomorrow and see unlimited frontiers just waiting to be explored. Our brightest discoveries are not yet known. Our most thrilling stories are not yet told. Our grandest journeys are not yet made. The American Age, the American Epic, the American Adventure, has only just begun!\n\nOur spirit is still young; the sun is still rising; God’s grace is still shining; and my fellow Americans, the best is yet to come!\n",
+      "tags": ["manifest destiny", "patriotism", "america"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 46,
+      "title": "Science of progress",
+      "text": "The science of progress? Why are more funds being given to older age researchers, why does progress happen in small places and time periods in the world (ex. Ancient Greece was discovering everything then you have the dark ages for 500 years, silicon valley is single handedly driving progress and raising living standards for the world) what policies/ incentive / environments need to exist to make more silicon valleys … Y Combinator is able to drive progress despite being a small group of people in california … the goal of progress is to contribute the the human body of knowledge to enable transformative discoveries to better people's lives and allow humans to explore and discover more",
+      "tags": ["science", "silicon valley", "progress", "patrick collison"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 47,
+      "title": "Marriage",
+      "text": "What unique trait does this prospective spouse have that nobody else is providing? How would you persuade the 20th child to join your family. Small market/minded value competition is for losers. Every boy and girl wants to become a monopoly.",
+      "tags": ["zero to one", "marriage"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 101,
+      "title": "the future",
+      "text": "Think about the future in concrete terms, stop turning inward meditation and yoga and look externally to shape the outside world. Future needs to be concrete and different from future",
+      "tags": ["peter thiel", "straussian"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 103,
+      "title": "end of globalization",
+      "text": "Raising the threat of apocalypse or runaway mimesis. As the world is global and everyone is copying everyone. This will lead to conflict over scarce resources. Each country should have its own unique system / view of the future designed for them and not trying to copy the US.",
+      "tags": ["mimesis", "peter thiel", "globalization"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 106,
+      "title": "Visual Effects",
+      "text": "nolan in westworld wanted to blend reality and VFX by doing everything real that he could and only adding VFX when he needed u can’t tell what’s real and what’s not and end up giving up trying to distinguish which makes it feel like your truly living in the future\n-Jay worth on depicting future in westworld",
+      "tags": ["future", "mind tricks", "Visual Effects", "westworld"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 109,
+      "title": "Snapchat’s insight",
+      "text": "There have always been hundreds of ways to send a picture, but we saw a succession of companies that worked out something new around user experience and psychology that took them beyond ‘photos’ to some deeper insight - first Flickr, then Facebook and Instagram, and then Snap. \n\n When Snap launched, there were infinite way to share images, but Snap asked a bunch of weird questions that no-one had really asked before. Why do you have to press the camera button - why doesn’t the app open in the camera? Why are you saving your messages - isn’t that like saving all your phone calls? Fundamentally, Snap asked ‘why, exactly, are you sending a picture? What is the underlying social purpose?’ You’re not really sending someone a sheet of pixels - you’re communicating. \n",
+      "tags": [
+        "investment trends",
+        "insight",
+        "innovation",
+        "zero to one",
+        "snapchat"
+      ],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 121,
+      "title": "Dev tools",
+      "text": "dev tools today suck compared to 1980. have all these compilers, packages,￼ dependencies, builds all these mental models you have to load into your brain to get something done. small talk the programming language was cool bc u can edit the source code to any program, make a change and u see it in real time , no compiling or building necessary. making dev tools better a big problem",
+      "tags": ["patrick collison", "hack club"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 123,
+      "title": "barriers to innovation and regulation",
+      "text": "the question to ask in regards to regulation is look at other successful companies in other countries and ask why didn't that happen in the US. we blame regulation so much, but perhaps it isnt that bad, the best companies still form in the US. perhaps regulations are slow to respond. example why did spotify start in sweden what prevented it from starting in the US",
+      "tags": ["regulation", "patrick collison", "innovation"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 141,
+      "title": "Jonathan Nolan WW3",
+      "text": "successful people in their fields\nalways push the bounds, J nolan always asked how can we take unity engine & lcd screens for the max, how can we push this cutting edge tech even furthur. when designing the map room for WW, it was cause they though 4k holographic projectors were cool and wanted to see how far they could take the tech. they are detail oriented, when imagining the city of the future, they would edit things out like cross walks stoplights, how wide the streets are, small details that flow over you, and make the environment look familiar but feel different",
+      "tags": ["future", "success", "artist", "jonathan nolan", "westworld"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 165,
+      "title": "Founders & researchers  ",
+      "text": "always ask the question what is the most important problem in your field and why are you not working on it, (combines independent thought, thinking of the future, and attack vectors) most are autonomous, hate arbitrary rules, bias for action, genuinely curious, work hard, have focus, are in no shortage of ideas, and know what is working and what’s not",
+      "tags": ["thinking", "traits", "founders", "success"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 171,
+      "title": "Economics thermodynamics ",
+      "text": "A good example of how info shouldn’t be siloed. in thermoeconomics Bryant published “A Thermodynamic Approach to Economics”, in which he argued that “economic value” is equivalent to “energy value”, that there exist economic equivalents to the first and second law of thermodynamics, and that inflation is a function of “net cycle entropy gain”. This shows how unrelated ideas in 2 fields perhaps share a common fundamental truth. ",
+      "tags": ["thermodynamics", "economics", "knowledge graph"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 173,
+      "title": "Managing coders",
+      "text": "as you add more coders to a project the skill increases linearly and communication and complexity overhead increases exponentially and the project slows, in any company reducing communication cost and friction / co ordination is the main goal of management and why working on a large scale tends to slow things down, u have to work hard to keep things moving fast at scale",
+      "tags": ["communications", "scale", "management"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 210,
+      "title": "Commodities and psychology",
+      "text": "Skype was first to VOIP but then it became a commodity and every app had voice, the question then was why do you have voice?  Hence, Clubhouse is built on ideas about psychology and behaviour, not VOIP, and it’s not trying to win ‘voice’. same thing will happen with video, best companies will find unique ways to add video that make sense as video tech is commoditized. does video fit in with your workflow\n\nwhen tech becomes a commodity the question shifts to product innovation / user psychology question ",
+      "tags": [
+        "framing the question",
+        "voice",
+        "commodities",
+        "investment trends",
+        "clubhouse"
+      ],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 223,
+      "title": "Competition theory",
+      "text": "does competition theory change with all the new products tech offers at scale and free prices, what is anti competitive at that point and how does it deal with the rapid changing nature of tech markets",
+      "tags": ["tech", "competition", "anti trust"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 224,
+      "title": "debt and slow growth",
+      "text": "Post WW2 inventions and innovation enable unreal and never before scene unit productivity growth (for every unit of labor you were getting double the output / productivity )  as a result living standards and wages increased at a rapid rate. This was unsustainable and now has reverted to the mean of 2-3% GDP growth a lot slower wage growth. You can see this in china as 10% growth slows … this was never sustainable for 30+ years. Peoples expectations now are such that they expect this rapid increase in living standards and wages (growth). So they turn to liberal politicians to take the existing pie and redistribute it so this growth happens for the 90% paid for by the 10% and a lot of debt (aka distributing parts of the pie that don’t exist). This is harmful as it slows growth vs increasing the size of the pie and there will come a point where you can’t promise more of a pie that doesn’t exist (a debt crisis). The solution is to support silicon valley so they can innovate, create untold wealth (growing the pie), bring down costs etc. this will bring back the growth and grow the pie so everyone can have more. This however takes time and create billionaires which society demonizes (they have bad PR team)",
+      "tags": ["default tag"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 240,
+      "title": "How to think in systems",
+      "text": "The work doesn’t work linearly, it works in systems\n\nThinking Linearly: “Going to good school leads to a good job”\n\nThinking in Systems: “Going to a good school activates your quality of thinking. This reinforces your ability to learn things, and the ability to iterate/loop on a problem is what Companies value.”\n",
+      "tags": ["meta", "systems thinking", "default tag"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 248,
+      "title": "Being authentic with your identity",
+      "text": "If you have an identity, everything you do is a vote towards who you want to become, it makes doing those things easier (escaping competition), hence identities should be aligned with your goals ex. If im a software engineer it makes sitting down to code easier bc that’s just who i am (same with gym bros etc) identities can create bias in thinking so balance it with first principles … allow identity to guide you to an answer and see if that answer logically makes sense.",
+      "tags": ["identity", "authentic", "default tag"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 285,
+      "title": "Beginners vs Experts",
+      "text": "an expert is one that is riding a bicycle fast, a beginner is one riding slower. if the expert proclaims themselves an expert and slows down the beginner pedaling fast to catch up will over take them. its important to keep a beginners mindset and always be learning, bc once you are an expert you are more focused on protecting your ego from fear of being wrong than learning new things. mastery is simply a beginner who recovers gracefully from failure. and the goal is to produce great work or products ego is a distraction and thus an expert mindset is a distraction. a true expert is simply one that has mastered the art of learning or thinking ... in the beginners mind there are many possibilities in the experts mind there are few",
+      "tags": ["growth", "thinking", "beginner mindset", "ego"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    },
+    {
+      "id": 305,
+      "title": "Elon on learning",
+      "text": "assume you are wrong and the goal is to be less wrong",
+      "tags": ["elon musk", "elon", "learning", "beginner mindset"],
+      "link": null,
+      "ownership": null,
+      "type": null
+    }
+  ]
+}

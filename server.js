@@ -4,7 +4,7 @@ var nJwt = require("njwt");
 var fs = require("fs");
 var cors = require("cors");
 //functions
-var { makeNote, editNote, getObjectByType, getTagsForNote, getTags} = require("./neo4jQueries.js");
+var { makeNote, editNote, getObjectByType, getTagsForNote, getTags, exportData} = require("./neo4jQueries.js");
 // models
 var Node = require("./Node.js");
 // Database
@@ -205,7 +205,9 @@ async function deleteNote(id){
 
 //  ---------- custom middleware create & cors
 var originsWhitelist = [
-  "http://localhost:3000" //this is my front-end url for development
+  "http://localhost:3000", //this is my front-end url for development
+  "http://thenubes.ddns.net",
+  "https://thenubes.ddns.net"
 ];
 var corsOptions = {
   origin: function(origin, callback) {
@@ -215,8 +217,9 @@ var corsOptions = {
     } else {
       callback(new Error("Not allowed by CORS"));
     }
-  },
-  credentials: true
+  }
+  // credentials: true
+   // Access-Control-Allow-Credentials is what credentials configures
 };
 
 let secretKey = "super secert key";
@@ -228,7 +231,7 @@ const AuthMiddleWare = (req, res, next) => {
   } else {
     key = req.headers.authorization.split(" ")[1];
   }
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   nJwt.verify(key, secretKey, function(err, token) {
     if (err) {
       console.log(err);
@@ -242,7 +245,7 @@ const AuthMiddleWare = (req, res, next) => {
 // ------- methods ----
 var router = express.Router();
 app.use(express.json());
-app.options("*", cors({ corsOptions }));
+app.options("*", cors( corsOptions ));
 app.use(AuthMiddleWare);
 app.use("/notesapp", router);
 app.use('/tweet', require('./tweet.js'));
@@ -498,6 +501,33 @@ router.delete("/deletenote/:id", (req, res) => {
 // for testing
 router.get('/', function(req, res) {
   res.json({ message: 'API is accessible' });
+});
+
+// for testing
+router.get('/export', function(req, res) {
+  if (req.token.authenticated) {
+    exportData(req.token.username)
+      .then(records => {
+        recordsarray = [];
+        records.forEach(record => {
+          recordsarray.push({
+            id: record.get(0).toNumber(),
+            title: record.get(1),
+            text: record.get(2),
+            tags: record.get(3),
+            link: record.get(4),
+            ownership: record.get(5),
+            type: record.get(6)
+          });
+        });
+        res.status(200).json({ data: recordsarray });
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
+  } else {
+    res.status(401).json({ error: "must sign in to export you data" });
+  }
 });
 
 const PORT = 8100;
