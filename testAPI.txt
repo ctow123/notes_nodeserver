@@ -10,3 +10,13 @@ curl -X PUT -d '{"type":"tag", "note":{ "title":"haemailtype is cool","text":"hi
 
 curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://www.example.com
 curl -H  "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOnRydWUsImV4cCI6MTU5NTk4MjE2N30.gHlZQnIbCsOLfpJe8jmdJhH0zVv4ng_JIoK8CzYxCaY" localhost:8100/notesapp/export
+
+authorized token
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVkIjp0cnVlLCJhdXRoZW50aWNhdGVkIjpmYWxzZSwiZXhwIjoxNzExMjY0MzQ2fQ.2Frw89KWy8YJglqTk6uQ4e_W6WXWZv-d79unHi3vCGA
+
+//testing updating links
+curl -X PUT -d '{"user": "hi"}' localhost:8000/apidb/userlinks -w "\n"
+//authorize but not authenticated
+curl -X PUT -d '{"user": "hi"}' --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVkIjp0cnVlLCJhdXRoZW50aWNhdGVkIjpmYWxzZSwiZXhwIjoxNzExMjY0MzQ2fQ.2Frw89KWy8YJglqTk6uQ4e_W6WXWZv-d79unHi3vCGA" localhost:8000/apidb/userlinks -w "\n"
+//authenticated
+curl -X PUT -d '{"user": "hi"}' --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhvcml6ZWQiOnRydWUsImF1dGhlbnRpY2F0ZWQiOnRydWUsImV4cCI6MTcxMTI2NDM0Nn0.r4bnBbFhjPJ4TqaPXpe1FnpsZemYu3PWGNHFTlKdrww" localhost:8000/apidb/userlinks -w "\n"

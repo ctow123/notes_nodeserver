@@ -5,7 +5,7 @@ from requests_oauthlib import OAuth1Session
 from pathlib import Path
 # print("Usage: python tl_CNN_test.py <Path to CNN Model>")
 # screenname = input('enter twitter user handle: ')
-
+# requests.get('http://localhost:8000/apidb/authorize').json()
 # ---- getting user timeline tweets (retweets?)
 url = "https://api.twitter.com/oauth2/token"
 s = consumer_key + ":" + consumer_secret

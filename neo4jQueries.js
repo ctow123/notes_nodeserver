@@ -15,6 +15,8 @@ will autosend date created / updated
 ownership - refering to things you wrote, vs things u pulled in original thoughts?
  */
 async function makeNote(note, username) {
+  var characters  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  var charactersLength = characters.length;
   var session = driver.session();
   var query = [];
   var params = {};
@@ -22,43 +24,44 @@ async function makeNote(note, username) {
   query.push(
     "CREATE (n:Note {title: $title, text: $text, username: $username, link: $link, datecreated: $date, dateupdated: $date, type: $type, public: true, ownership: true})"
   );
-  params.type = note.type
-  params.link = note.link;
+  params.type = typeof note.type === 'undefined' ? '' : note.type
+  params.link = typeof note.link === 'undefined' ? '' : note.link
   params.title = note.title;
   params.text = note.text;
   params.username = username;
   params.date = Date.now();
   for (let i = 0; i < note.tags.length; i++) {
+    let char = characters.charAt(Math.floor(Math.random() * charactersLength))
     await getTag(note.tags[i], username).then(result => {
       if (result.exists) {
         query.push("WITH n");
         query.push(
           "MATCH (" +
-            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") +
+            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) +
             ":Tag) WHERE " +
-            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") +
+            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) +
             ".tag in {tag" +
             i +
             "} AND " +
-            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") +
+            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) +
             ".username = $username"
         );
-        query.push("CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") + ")");
-        query.push("CREATE (" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") + ")-[:MENTIONED_IN]->(n)");
+        query.push("CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) + ")");
+        query.push("CREATE (" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) + ")-[:MENTIONED_IN]->(n)");
         params["tag" + i] = note.tags[i];
       } else {
         query.push(
           "CREATE (" +
-            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") +
+            note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) +
             ":Tag {tag: $tag" +
             i +
             ", username: $username})"
         );
         query.push(
-          "CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") + ")"
+          "CREATE (n)-[:TALKS_ABOUT]->(" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) + ")"
         );
         query.push(
-          "CREATE (" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X") + ")-[:MENTIONED_IN]->(n)"
+          "CREATE (" + note.tags[i].replace(/ /g,'').replace(/[0-9]/g, "X" + char) + ")-[:MENTIONED_IN]->(n)"
         );
         params["tag" + i] = note.tags[i];
         tags.push("t" + i);
@@ -275,6 +278,12 @@ async function editNote(type, id, note, username) {
       });
     return stats.summary.updateStatistics;
   }
+  else if (type === 'close'){
+    editNote('title', id, note, username)
+    editNote('text', id, note, username)
+    editNote('tags', id, note, username)
+    // editNote('link', id, note, username)
+  }
 }
 
 
@@ -324,11 +333,19 @@ function getTagsForNote(noteid, username) {
 }
 
 // get all tags associated with a username, and number of times each tag is mentioned
-function getTags(username) {
+function getTags(username, type) {
+  query = ''
+  if(typeof type === 'undefined'){
+    query = "MATCH (n:Tag) WHERE n.username = {username} WITH n MATCH (n)-[r:MENTIONED_IN]->() RETURN n.tag, COUNT(r)"
+  }
+  else{
+    query = "MATCH (n:Tag) WHERE n.username = {username} WITH n MATCH (n)-[r:MENTIONED_IN]->(note:Note {type: $type}) RETURN n.tag, COUNT(r)"
+  }
   var session = driver.session();
   return session
-    .run("MATCH (n:Tag) WHERE n.username = {username} WITH n MATCH (n)-[r:MENTIONED_IN]->() RETURN n.tag, COUNT(r)", {
-      username: username
+    .run(query, {
+      username: username,
+      type: type
     })
     .then(result => {
       session.close();
