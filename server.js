@@ -3,6 +3,7 @@ var app = express();
 var nJwt = require("njwt");
 var fs = require("fs");
 var cors = require("cors");
+const path = require('path')
 //functions
 var { makeNote, editNote, getObjectByType, getTagsForNote, getTags, exportData} = require("./neo4jQueries.js");
 // models
@@ -42,47 +43,78 @@ function pairwise(list) {
 
 // get the weights for the paths between tag nodes
 // getPathWeights rewrite for speed
-async function getPathWeights2(username){
-  let tags = await getTags(username)
+async function getPathWeights2(username, type) {
+  tagscount = {};
+  tagApperanceSum = 0
+  let tags = await getTags(username,type)
     .then(tags => {
       tagsarray = [];
       tags.forEach(tag => tagsarray.push(tag.get(0)));
+      tags.forEach(tag => {
+        tagscount[tag.get(0)] = tag.get(1).toNumber();
+        tagApperanceSum = tagApperanceSum + tag.get(1).toNumber()
+      }
+      );
       return tagsarray;
     })
     .catch(err => {
       console.log(err.toString());
     });
-  let pathsweights = [];
-  let pathsweightsdict = {}
+  let pathsweightsdict = {};
+  var total = 0
+  var max =  Math.ceil(tags.length / 100)
+  var filter = 0
+  if(tags.length > 300){
+    max = 4
+    // console.log(tagApperanceSum / tags.length);
+    filter = Math.floor(tagApperanceSum / tags.length)
+    if (filter > 8){
+            filter = 8
+    }
+
+  }
   // await the array of promises
-    await Promise.all(tags.map(async (tag) => {
+  for (let i = 0; i < max; i++) {
+    await Promise.all(
+      tags.slice(i * 100, 100 * (i + 1)).map(async tag => {
+        // console.log(tagscount[tag]);
+        // if tagcount[tag] < 1 , dont run query
+        if( tagscount[tag] > filter){
         var session = driver.session();
-      await session
-        .run(
-          "MATCH (n:Tag {tag: $pairone, username: $username})-[r:MENTIONED_IN*2]-(t2:Tag {username: $username}) RETURN n.tag,t2.tag, count(r)",
-          {
-          pairone: tag,
-          username: username
-          }
-        )
-        .then(results => {
-          session.close();
-          (results.records).forEach( (item, index) => {
-            if(pathsweightsdict[results.records[index].get(1) + '][' + results.records[index].get(0)]){
-              pathsweightsdict[results.records[index].get(1) + '][' + results.records[index].get(0)] += results.records[index].get(2).toNumber()
+        await session
+          .run(
+            "MATCH (n:Tag {tag: $pairone, username: $username})-[r:MENTIONED_IN*2]-(t2:Tag {username: $username}) RETURN n.tag,t2.tag, count(r)",
+            {
+              pairone: tag,
+              username: username
             }
-            else{
-            pathsweightsdict[results.records[index].get(0) + '][' + results.records[index].get(1)] = results.records[index].get(2).toNumber()
-          }
+          )
+          .then(results => {
+            session.close();
+            results.records.forEach((item, index) => {
+              if (
+                pathsweightsdict[results.records[index].get(1) + "][" +results.records[index].get(0)]
+              ) {
+                pathsweightsdict[
+                  results.records[index].get(1) + "][" + results.records[index].get(0)] += results.records[index].get(2).toNumber();
+              } else {
+                pathsweightsdict[
+                  results.records[index].get(0) +  "][" +  results.records[index].get(1)] = results.records[index].get(2).toNumber();
+              }
+              total = total + results.records[index].get(2).toNumber();
+            });
           })
-        })
-        .catch(error => {
-          session.close();
-          throw error;
-        });
-    }))
-    return [pathsweightsdict]
+          .catch(error => {
+            session.close();
+            throw error;
+          });
+        }
+      })
+    );
+  }
+  return {'weights': pathsweightsdict, 'count': Object.keys(pathsweightsdict).length  , 'sum': total, 'tagsLength': tags.length};
 }
+
 
 async function getRelated(username, tag){
   var session = driver.session();
@@ -105,7 +137,7 @@ async function getRelated(username, tag){
 function getTitles(username) {
   var session = driver.session();
   return session
-    .run("MATCH (n:Note) WHERE n.username = {username} RETURN n.title, n.dateupdated", {
+    .run("MATCH (n:Note) WHERE n.username = {username} OPTIONAL MATCH (n)-[:TALKS_ABOUT]->(tags) RETURN id(n), n.title, n.text, collect(tags.tag), n.link, n.dateupdated", {
       username: username
     })
     .then(result => {
@@ -142,6 +174,8 @@ function searchNotesTag(query) {
 }
 
 // implements search using neo4j's fulltext indexing
+// CALL db.index.fulltext.createNodeIndex('smartSearch',['Note','Tag'],['tag','title','text','link'])
+// if returns tags get the notes associated with those tags
 function smartSearch(query){
   var session = driver.session();
   return session
@@ -211,7 +245,6 @@ var originsWhitelist = [
 ];
 var corsOptions = {
   origin: function(origin, callback) {
-    console.log("hi", origin);
     if (originsWhitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -225,13 +258,24 @@ var corsOptions = {
 let secretKey = "super secert key";
 const AuthMiddleWare = (req, res, next) => {
   let key;
-  if (typeof req.headers.authorization === "undefined") {
+// && !!req.get('user-Agent').match(/Mozilla/)
+  if (typeof req.headers.authorization === "undefined"  ){
+//     {
+//   "authorized": true,
+//   "authenticated": false,
+//   "username" : 'con'.
+//   "exp": 1711264346
+// }
     key =
-      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImNvbiIsImF1dGhlbnRpY2F0ZWQiOmZhbHNlLCJleHAiOjE3MTEyNjQzNDZ9.Wyvk3K-nmax4PDRS2yb35VhFunpsyMy8xTVVEvUwEqg";
-  } else {
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVkIjp0cnVlLCJhdXRoZW50aWNhdGVkIjpmYWxzZSwiZXhwIjoxNzExMjY0MzQ2fQ.2Frw89KWy8YJglqTk6uQ4e_W6WXWZv-d79unHi3vCGA";
+  }
+  else if (typeof req.headers.authorization === "undefined" ){
+    key = ''
+  }
+  else{
     key = req.headers.authorization.split(" ")[1];
   }
-  // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   nJwt.verify(key, secretKey, function(err, token) {
     if (err) {
       console.log(err);
@@ -286,9 +330,9 @@ router.post("/makenote", (req, res) => {
 
 
 
-// user can edit text, tags, or title of their note ... conflicts resolved by dateupdated
+// user can edit text, tags, or title of THEIR note ... conflicts resolved by dateupdated
 router.put("/editnote/:id", (req, res) => {
-  if (req.token.authenticated) {
+  if (req.token.authenticated && (req.token.username === req.body.user)) {
     let stats = editNote(
       req.body.type,
       req.params.id,
@@ -327,7 +371,7 @@ router.put("/editnote/:id", (req, res) => {
 router.get("/searchnotes", (req, res) => {
   console.log(req.query);
   if (req.query.lookupBy === "tag") {
-    searchNotesTag({ tag: req.query.lookupField, username: req.token.username })
+    searchNotesTag({ tag: req.query.lookupField, username: req.query.user })
       .then(records => {
         dictofnodes = {};
         records.forEach(record => {
@@ -357,10 +401,8 @@ router.get("/searchnotes", (req, res) => {
       });
   } else if (req.query.lookupBy === "title") {
     res.status(200).json({ message: "note implemented yet" });
-  } else if (req.query.lookupBy === "date") {
-    res.status(200).json({ message: "search completed" });
-  } else {
-    smartSearch({ term: req.query.lookupField, username: req.token.username })
+ } else {
+    smartSearch({ term: req.query.lookupField, username: req.query.user })
       .then(records => {
         arrayofnodes = [];
         records.forEach(record => {
@@ -381,66 +423,87 @@ router.get("/searchnotes", (req, res) => {
 });
 
 
-// get list of all possible tags for a user
+// get list of all possible tags for a user, need to query the user ?user=' '
 router.get("/getTagsList", (req, res) => {
-  let user = typeof req.query.username !== "undefined" ? req.query.username : req.token.username
-  getTags(user)
-    .then(tags => {
-      tagsarray = [];
-      tagscount = {};
-      tags.forEach(tag => tagsarray.push(tag.get(0)));
-      tags.forEach(tag => tagscount[tag.get(0)] = tag.get(1).toNumber())
-      res.status(200).json({ tags: tagsarray, tagsCount: tagscount });
-    })
-    .catch(err => {
-      res.status(400).json({ error: err.toString() });
-    });
+  if (req.token.authorized) {
+    getTags(req.query.user, req.query.type)
+      .then(tags => {
+        tagsarray = [];
+        tagscount = {};
+        tagApperanceSum = 0
+        tags.forEach(tag => tagsarray.push(tag.get(0)));
+        tags.forEach(tag => {
+          tagscount[tag.get(0)] = tag.get(1).toNumber()
+          tagApperanceSum = tagApperanceSum + tag.get(1).toNumber()
+        });
+        res.status(200).json({ tags: tagsarray, tagsCount: tagscount, tagSum: tagApperanceSum});
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
+  } else {
+    res.status(401).json({ error: "not authorized for this resource" });
+  }
 });
+
 
 // get list of all possible note titles for a user
 router.get("/getTitlesList", (req, res) => {
-  getTitles(req.token.username)
-    .then(titles => {
-      titlearray = [];
-      titles.forEach(title => titlearray.push({title: title.get(0), date: title.get(1)}));
-      res.status(200).json({ titles: titlearray });
-    })
-    .catch(err => {
-      res.status(400).json({ error: err.toString() });
-    });
+  if (req.token.authorized) {
+    getTitles(req.query.user)
+      .then(titles => {
+        titlearray = [];
+        titles.forEach(title => titlearray.push({id: title.get(0).toNumber(), title: title.get(1) ,text:  title.get(2), tags:  title.get(3), date: title.get(5)}));
+        res.status(200).json({ titles: titlearray });
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
+  } else {
+    res.status(401).json({ error: "not authorized for this resource" });
+  }
+
 });
 
-// get all blogs for a user
+// get all blogs for a user, query user=* *
 router.get("/getBlogs", (req, res) => {
-  getObjectByType(req.token.username, 'blog')
-    .then(records => {
-      blogarray = [];
-      records.forEach(record => {
-        blogarray.push({
-          id: record.get(0).toNumber(),
-          title: record.get(1),
-          text: record.get(2),
-          tags: record.get(3),
-          link: record.get(4)
+  if (req.token.authorized) {
+    getObjectByType(req.query.user, 'blog')
+      .then(records => {
+        blogarray = [];
+        records.forEach(record => {
+          blogarray.push({
+            id: record.get(0).toNumber(),
+            title: record.get(1),
+            text: record.get(2),
+            tags: record.get(3),
+            link: record.get(4)
+          });
         });
+        res.status(200).json({ blogs: blogarray });
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
       });
-      res.status(200).json({ blogs: blogarray });
-    })
-    .catch(err => {
-      res.status(400).json({ error: err.toString() });
-    });
+  } else {
+    res.status(401).json({ error: "not authorized for this resource" });
+  }
+
 });
 
 // get the weights between the paths of tags
 router.get("/getPathWeights", (req, res) => {
-  let user = typeof req.query.username !== "undefined" ? req.query.username : req.token.username
-  getPathWeights2(user)
-    .then(weights => {
-      res.status(200).json({ weights: weights });
-    })
-    .catch(err => {
-      res.status(400).json({ error: err.toString() });
-    });
+  if (req.token.authorized) {
+    getPathWeights2(req.query.user, req.query.type)
+      .then(results => {
+        res.status(200).json({ weights: results.weights, edgeSum: results.sum , edgeCount: results.count, tagsLength: results.tagsLength });
+      })
+      .catch(err => {
+        res.status(400).json({ error: err.toString() });
+      });
+  } else {
+    res.status(401).json({ error: "not authorized for this resource" });
+  }
 });
 
 // get recommended tags for a note you make
@@ -459,7 +522,8 @@ router.get("/getRecommendTags", (req, res) => {
 
 // get related topics to a tag
 router.get("/getRelated", (req, res) => {
-    getRelated(req.token.username, req.query.tag)
+  if (req.token.authorized) {
+    getRelated(req.query.user, req.query.tag)
     .then(results => {
       tagsarray = [];
       results.forEach(record => tagsarray.push(record.get(0)));
@@ -468,6 +532,10 @@ router.get("/getRelated", (req, res) => {
     .catch(err => {
       res.status(400).json({ error: err.toString() });
     });
+  } else {
+    res.status(401).json({ error: "not authorized for this resource" });
+  }
+
 });
 
 // router.get("/getNotebyID", (req, res) => {
@@ -484,8 +552,7 @@ router.get("/getRelated", (req, res) => {
 
 // user wants to delete a note
 router.delete("/deletenote/:id", (req, res) => {
-  console.log(req.body);
-  if (req.token.authenticated) {
+  if (req.token.authenticated && (req.token.username === req.body.user)) {
     deleteNote(req.params.id)
       .then(result => {
         res.status(200).json({ message: result });
@@ -529,6 +596,45 @@ router.get('/export', function(req, res) {
     res.status(401).json({ error: "must sign in to export you data" });
   }
 });
+
+// testing inference
+router.get("/getInference", function(req, res) {
+  // req.token.username
+  if ( req.token.authorized && req.query.text !== "") {
+    let thetext = req.query.text
+    if((req.query.text).length > 270){
+      thetext = thetext.substring(0,270)
+    }
+    const spawn = require("child_process").spawn;
+    const pythonProcess = spawn("python3", [
+      path.join(__dirname, "/ML_pipeline_train/inference.py"),
+      "realtime",
+      thetext
+    ]);
+    pythonProcess.stdout.on("data", data => {
+      // Do something with the data returned from python script
+      console.log(data.toString());
+      let thetags = [
+        ...new Set(data.toString().replace("\n", "").replace(/\s/g, '').replace("_", " ").replace("<|endoftext|>", "").split(","))
+      ];
+      thetags = thetags.filter(function(e) {
+        return e !== " " && e !== '';
+      });
+      console.log(thetags);
+      res.status(200).json({ tags: thetags });
+    });
+    pythonProcess.on("error", function() {
+      console.log("Failed to start child.");
+    });
+    pythonProcess.on("exit", function(code) {
+      console.log("Exited with code " + code);
+    });
+  } else {
+    res.status(401).json({ error: "text cannot be blank / unauthorized" });
+  }
+});
+
+
 
 const PORT = 8100;
 const HOST = "0.0.0.0";
