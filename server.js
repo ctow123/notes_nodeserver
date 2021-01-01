@@ -605,6 +605,7 @@ router.get("/getInference", function(req, res) {
     if((req.query.text).length > 270){
       thetext = thetext.substring(0,270)
     }
+    // may have to use full python3 path /usr/bin/python3?
     const spawn = require("child_process").spawn;
     const pythonProcess = spawn("python3", [
       path.join(__dirname, "/ML_pipeline_train/inference.py"),
