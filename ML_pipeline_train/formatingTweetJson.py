@@ -4,9 +4,13 @@ import sys
 import re
 from pathlib import Path
 from datetime import date
-# 2 directories up
+from twitter_script import getUserID
+
+"""
+going 2 directories up to add notes_nodeserver to pythonpaths so i can import .py modules
+from there
+"""
 p = Path(os.path.abspath(__file__)).parents[1]
-# adding note_server to pythonpaths so i can import .py modules from there
 sys.path.insert(0,str(p))
 from secerts import consumer_key,consumer_secret
 
@@ -15,90 +19,159 @@ from secerts import consumer_key,consumer_secret
 # sys.argv[1]
 #sys.argv[2]
 DIR = '../tweets/'
-FILENAME = 'erikmaster.json'
-# FILENAME = 'eriktorenberg_20200727-000000.json'
+USERID = '1475495658'
+# FILENAME = 'erikmaster.json'
+# FILENAME = "micsolana_20210101-000000.json" search ][ and repalce with ,
+FILENAME = 'eriktorenberg_20210103-000000.json'
 THREADS = FILENAME.split('.')[0] + '_threads.json'
 EXTRACTED = FILENAME.split('.')[0] + '_extracted.json'
 LABELED = FILENAME.split('.')[0] + '_labeled.json'
 LABELED2 = FILENAME.split('.')[0] + '_labeled2.json'
 
+"""
+puts all the tweets from a raw tweet file into a file with merged tweet threads, with tweet id of the first
+tweet in the thread
+PROOF LOGIC THREADS: 
+"""
 def extract(FILENAME, DIR, EXTRACTED):
-        # extracting the important features from raw twitter text
-        # opening files
         with open(DIR + FILENAME) as f:
           data = json.load(f)
 
         # variables
-        alltxt = []
+        # alltxt = []
         extractedList = []
         jsondict = {}
         # building dictionary
         for index, entry in enumerate(data):
-            alltxt = alltxt + [{'full_text': entry['full_text']}]
+            # alltxt = alltxt + [{'full_text': entry['full_text']}]
             jsondict.update({entry['id']:entry})
 
         # building threads
         # entry['user']['screen_name']
         threads = []
         threadmap = {}
+
         for index, entry in enumerate(data):
-            parent = entry['in_reply_to_status_id']
-            temp_in_reply_user = entry['in_reply_to_user_id']
-            curr = entry['id']
-            #  and temp_in_reply_user == 18989355
-            while parent != None:
-                try:
-                    # building thread map start -> end of thread
-                    if threadmap.get(parent) == None and threadmap.get(curr) == None :
-                        tempslst = sllist([parent, curr])
-                        threadmap.update({parent: tempslst})
-                        threadmap.update({curr: tempslst })
-                    elif threadmap.get(parent) == None and threadmap.get(curr) != None :
-                        tempslst = threadmap.get(curr)
-                        pos = None
-                        for index,value in enumerate(tempslst):
-                            if value == curr:
-                                pos = index
-                                break;
-                        tempslst.insertbefore(parent,tempslst.nodeat(pos))
-                        threadmap.update({parent: tempslst})
-                        threadmap.update({curr: tempslst })
-                    # elif threadmap.get(parent) != None and threadmap.get(curr) == None :
-                    #     print('thiscase')
-                    # else:
-                    #     print('final case no cover')
-                    curr = parent
-                    parent = (jsondict[parent])['in_reply_to_status_id']
-                    temp_in_reply_user = (jsondict[parent])['in_reply_to_user_id']
-                except KeyError:
-                    parent = None
-                    temp_in_reply_user = 0
+            # parent = in_reply_to_user_id
+            # child = author_id
+            # id, referenced_tweets.id
+            try:
+                x = list(filter(lambda item: item['type'] == 'replied_to', entry['referenced_tweets']))
+                # print(x)
+                parent = x[0]['id']
+            # temp_in_reply_user = entry['in_reply_to_user_id']
+                curr = entry['id']
+                while parent != None:
+                    try:
+                        # building thread map start -> end of thread
+                            if threadmap.get(parent) == None and threadmap.get(curr) == None:
+                                tempslst = sllist([parent, curr])
+                                threadmap.update({parent: tempslst})
+                                threadmap.update({curr: tempslst})
+                            elif threadmap.get(parent) == None and threadmap.get(curr) != None:
+                                tempslst = threadmap.get(curr)
+                                pos = None
+                                for index,value in enumerate(tempslst):
+                                    if value == curr:
+                                        pos = index
+                                        break;
+                                tempslst.insertbefore(parent,tempslst.nodeat(pos))
+                                for val in tempslst:
+                                    threadmap.update({val: tempslst})
+                            elif threadmap.get(parent) != None and threadmap.get(curr) == None:
+                                tempslst = threadmap.get(parent)
+                                # print('hi__', tempslst, curr)
+                                # ^need to update the index of all elements in that list to point to new tempslst.
+                                pos = None
+                                for index,value in enumerate(tempslst):
+                                    if value == parent:
+                                        pos = index
+                                        break;
+                                # print(pos, entry['referenced_tweets'][0])
+                                # print(type(pos))
+                                # print(tempslst)
+                                tempslst.insertafter(curr,tempslst.nodeat(pos))
+                                # print('bye__', tempslst)
+                                for val in tempslst:
+                                    threadmap.update({val: tempslst})
+                                # threadmap.update({parent: tempslst})
+                                # threadmap.update({curr: tempslst })
+                            curr = parent
+                            x = list(filter(lambda item: item['type'] == 'replied_to', (jsondict[parent])['referenced_tweets']))
+                            # print(x)
+                            parent = x[0]['id']
+                            # print("next___", curr, parent)
+                            # parent = (jsondict[parent])['referenced_tweets'][0]['id']
+                        # temp_in_reply_user = (jsondict[parent])['in_reply_to_user_id']
+                    except (KeyError,IndexError) as e:
+                        parent = None
+                        # temp_in_reply_user = 0
+            except (KeyError,IndexError) as e:
+                continue
 
-
+        # print(threadmap)
         unithreads = set(threadmap.values())
+
+        print(unithreads)
+        print(len(unithreads))
+        # threads where jsondict[n] is blank bc its not a thread but reply
         for thread in unithreads:
             first = thread.first.value
             tempthread = ''
             while True:
                 try:
                     n = thread.popleft()
-                    tempthread = tempthread + (jsondict[n])['full_text']
+                    tempthread = tempthread + (jsondict[n])['text'] + " "
+                    # removing for dups
                     jsondict.pop(n)
                 except:
                     if tempthread != '':
                         threads = threads + [{'thread': tempthread}]
-                        extractedList.append({'full_text' : tempthread, 'tweetID': first})
+                        extractedList.append({'text' : tempthread, 'tweetID': first})
                     break
 
         # put all threads into a file
-        # threadfile = open(DIR + THREADS,"w+")
-        # json.dump(threads ,threadfile)
+        threadfile = open(DIR + THREADS,"w+")
+        json.dump(threads ,threadfile)
 
 
         for key in jsondict:
-            extractedList.append({'full_text' : jsondict[key]['full_text'] ,'tweetID':  jsondict[key]['id']})
+            extractedList.append({'text' : jsondict[key]['text'] ,'tweetID':  jsondict[key]['id']})
         extracted = open(DIR + EXTRACTED,"w+")
         json.dump(extractedList ,extracted)
+
+
+
+# converts tweet timeline data receieved from twitter 1.1 api to data received 2.0 api
+def V1toV2(FILENAME, DIR, V2FILENAME):
+    with open(DIR + FILENAME) as f:
+        data = json.load(f)
+     # variables
+    v2data = []
+    # building dictionary
+    for index, entry in enumerate(data):
+        if entry['in_reply_to_status_id_str'] != None:
+            newentry = {'created_at': entry['created_at'], 'text': entry['full_text'], 'entities': {'mentions': entry['entities']['user_mentions']},
+            'conversation_id' : entry['id'], 'id' : entry['id'], 'entities': {'urls': entry['entities']['urls']}, 'referenced_tweets' :{'type': 'replied_to', 'id': entry['in_reply_to_status_id_str']},
+            'author_id' : entry['user']['id_str'], 'in_reply_to_user_id' : entry['in_reply_to_user_id_str'], 'public_metrics': {  "retweet_count": entry['retweet_count'],
+            "reply_count": 0,"like_count": entry['favorite_count'],"quote_count": 0}
+            }
+        elif entry['retweet']:
+            newentry = {'created_at': entry['created_at'], 'text': entry['full_text'], 'entities': {'mentions': entry['entities']['user_mentions']},
+            'conversation_id' : entry['id'],'id' : entry['id'], 'entities': {'urls': entry['entities']['urls']}, 'referenced_tweets' :{'type': 'retweet', 'id': entry['in_reply_to_status_id_str']},
+            'author_id' : entry['user']['id_str'], 'in_reply_to_user_id' : entry['in_reply_to_user_id_str'], 'public_metrics': {  "retweet_count": entry['retweet_count'],
+            "reply_count": 0,"like_count": entry['favorite_count'],"quote_count": 0}
+            }
+        else:
+            newentry = {'created_at': entry['created_at'], 'text': entry['full_text'], 'entities': {'mentions': entry['entities']['user_mentions']},
+            'conversation_id' : entry['id'],'id' : entry['id'], 'entities': {'urls': entry['entities']['urls']}, 'referenced_tweets' :{},
+            'author_id' : entry['user']['id_str'], 'in_reply_to_user_id' : entry['in_reply_to_user_id_str'], 'public_metrics': {  "retweet_count": entry['retweet_count'],
+            "reply_count": 0,"like_count": entry['favorite_count'],"quote_count": 0}
+            }
+        v2data.append(newentry)
+    with open(DIR + V2FILENAME) as f2:
+        json.dump(f2, v2data)
+
 
 # merges the tweets collected at various dates into one file (the base or truth)
 def merge(USERNAME, DIR, OUTPUTFILE):
@@ -139,47 +212,32 @@ def inferencedStrToArray(DIR, LABELED, LABELED2):
     json.dump(alltxt ,annotated)
 
 
-#function for getting a users timeline tweets
-def gatherTweets(username, DIR):
-    url = "https://api.twitter.com/oauth2/token"
-    s = consumer_key + ":" + consumer_secret
-    base64s = (base64.b64encode(s.encode('utf-8'))).decode('utf-8')
-    headers = {'Authorization': "Basic " + base64s, "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"}
-    data ={"grant_type" : "client_credentials"}
-    x = requests.post(url, data = data, headers = headers)
-    test = (x.content).decode('utf-8')
-    test2 = json.loads(test)
-    ttoken = test2['access_token']
-    base64s2 = (base64.b64encode(ttoken.encode('utf-8'))).decode('utf-8')
-    params = { 'Authorization': 'Bearer ' + ttoken}
+# ---------------------------------------
+# main method
+def main():
+    # x = getUserID('eriktorenberg')
+    # # print(x)
+    extract(FILENAME, DIR, EXTRACTED)
+    with open(DIR + THREADS) as f2:
+        data2 = json.load(f2)
+        print(len(data2))
+    with open(DIR + EXTRACTED) as f3:
+        data2 = json.load(f3)
+        print(len(data2))
+    # if len(sys.argv) != 3:
+    #     print("Usage: python3 twitter_script.py <twitter username> <options: [tweets, favorites]>")
+    #     exit()
+    # getBearer()
+    # screenname = sys.argv[1]
+    # favoritesfilename = screenname + '_favorites_' + date.today().strftime("%Y%m%d-%H%M%S")
+    # filename = screenname + '_' + date.today().strftime("%Y%m%d-%H%M%S")
+    # if sys.argv[2] == 'tweets':
+    #     getTweets(screenname,filename)
+    # elif sys.argv[2] == 'favorites':
+    #     getFavorites(screenname,favoritesfilename)
+    # else:
+    #     print("Usage: python3 twitter_script.py <twitter username> <options: [tweets, favorites]>")
+    #     exit()
 
-    screenname = username
-    filename = screenname + '_' + date.today().strftime("%Y%m%d-%H%M%S")
-
-    maxid = ''
-    count = 0
-    while count < 100:
-        response = ''
-        if maxid is '':
-            response = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name='+ screenname+'&tweet_mode=extended&count=200', headers = params).json()
-        else:
-            response = requests.get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name='+ screenname+'&max_id='+ maxid+'&tweet_mode=extended&count=200', headers = params).json()
-
-        if response[-1]['id_str'] == maxid:
-            print('done ' + username)
-            count = 100
-        maxid = response[-1]['id_str']
-        try:
-            with open(DIR + filename + '.json', 'r') as f:
-                try:
-                    list2= json.load(f)
-                except:
-                    list2 = []
-                    print('errpr')
-        except:
-            list2 = []
-            pass
-        dict2 = response+list2
-        with open( DIR + filename + '.json', 'w+') as f2:
-            json.dump(dict2, f2)
-        count += 1
+if __name__ == "__main__":
+    main()
