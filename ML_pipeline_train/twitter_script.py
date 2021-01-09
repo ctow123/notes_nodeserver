@@ -13,11 +13,12 @@ from there
 p = Path(os.path.abspath(__file__)).parents[1]
 sys.path.insert(0,str(p))
 from secerts import consumer_key,consumer_secret
-BEARERTOKEN = ''
-HEADERS = {'content-type': 'application/json'}
-# requests.get('http://localhost:8000/apidb/authorize').json()
 
-#
+# GLOBALS
+HEADERS = {'content-type': 'application/json'}
+
+# generates the Oauth2 bearer token good for reads, Oauth1 sends requests on behalf of dev user
+# Oauth 3-legged sends requests on behalf of other users
 def getBearer():
     url = "https://api.twitter.com/oauth2/token"
     s = consumer_key + ":" + consumer_secret
@@ -28,7 +29,6 @@ def getBearer():
     # print(x.content)
     test = (x.content).decode('utf-8')
     test2 = json.loads(test)
-    # print(test2['access_token'])
     ttoken = test2['access_token']
     HEADERS['Authorization'] = 'Bearer ' + ttoken
     # HEADERS = { 'Authorization': 'Bearer ' + ttoken}
@@ -72,10 +72,12 @@ def getFavorites(screenname, filename):
 
 """
 This is using twitters api v2 to get a users timeline tweets
-according the the api you can get the 3200 most recent ones
+according the the api you can get the 3200 most recent ones, need to get the id for
+their usename first in v2
 
 """
 def getUserID(username):
+    getBearer()
     url = 'https://api.twitter.com/2/users/by/username/{}'.format(username)
     response = requests.request("GET", url, headers=HEADERS).json()
     # response {data: {id, username, name}}
@@ -96,8 +98,12 @@ def getTweets(username,filename):
         count += 1
         params['pagination_token'] = response["meta"]["next_token"]
         response = requests.request("GET", url, headers=HEADERS, params=params).json()
+        # response['data'] may be null
         with open('../tweets/' + filename + '.json', 'a') as f2:
+            try:
                 json.dump(response['data'], f2)
+            except:
+                pass
 
 
 # -----FULL ARCHIVE------------
@@ -122,7 +128,6 @@ def main():
     filename = screenname + '_' + date.today().strftime("%Y%m%d-%H%M%S")
     if sys.argv[2] == 'tweets':
         getTweets(screenname,filename)
-    # noinspection SyntaxWarning
     elif sys.argv[2] == 'favorites':
         getFavorites(screenname,favoritesfilename)
     else:
