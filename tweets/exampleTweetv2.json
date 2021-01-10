@@ -1,0 +1,246 @@
+{
+  "entities": {
+    "mentions": [{
+      "start": 0,
+      "end": 11,
+      "username": "HipCityReg"
+    }],
+    "urls": [{
+      "start": 25,
+      "end": 48,
+      "url": "https://t.co/cCf2Tqg1wG",
+      "expanded_url": "https://twitter.com/micsolana/status/1345193811958501377/photo/1",
+      "display_url": "pic.twitter.com/cCf2Tqg1wG"
+    }]
+  },
+  "created_at": "2021-01-02T02:22:51.000Z",
+  "text": "@HipCityReg this kind of https://t.co/cCf2Tqg1wG",
+  "lang": "en",
+  "conversation_id": "1345166474495860738",
+  "referenced_tweets": [{
+    "type": "replied_to",
+    "id": "1345166474495860738"
+  }],
+  "id": "1345193811958501377",
+  "attachments": {
+    "media_keys": ["16_1345193802131234816"]
+  },
+  "author_id": "18989355",
+  "source": "Twitter for iPhone",
+  "in_reply_to_user_id": "4212050175",
+  "public_metrics": {
+    "retweet_count": 0,
+    "reply_count": 0,
+    "like_count": 7,
+    "quote_count": 0
+  }
+}, {
+  "entities": {
+    "mentions": [{
+      "start": 3,
+      "end": 12,
+      "username": "KTmBoyle"
+    }]
+  },
+  "context_annotations": [{
+    "domain": {
+      "id": "3",
+      "name": "TV Shows",
+      "description": "Television shows from around the world"
+    },
+    "entity": {
+      "id": "10050827376",
+      "name": "Fight or Flight? The Drunken Truth"
+    }
+  }],
+  "created_at": "2020-12-23T14:48:00.000Z",
+  "text": "RT @KTmBoyle: “The men and women leaving are the talent, they have started the incubators, they have built the companies, they have funded…",
+  "lang": "en",
+  "conversation_id": "1341757455609425926",
+  "referenced_tweets": [{
+    "type": "retweeted",
+    "id": "1341693543866392576"
+  }],
+  "id": "1341757455609425926",
+  "author_id": "18989355",
+  "source": "Twitter for iPhone",
+  "reply_settings": "everyone",
+  "public_metrics": {
+    "retweet_count": 6,
+    "reply_count": 0,
+    "like_count": 0,
+    "quote_count": 0
+  }
+}, {
+  "entities": {
+    "mentions": [{
+      "start": 0,
+      "end": 7,
+      "username": "eiaine"
+    }],
+    "annotations": [{
+      "start": 188,
+      "end": 193,
+      "probability": 0.3996,
+      "type": "Organization",
+      "normalized_text": "Airbnb"
+    }],
+    "urls": [{
+      "start": 265,
+      "end": 288,
+      "url": "https://t.co/g9wrDiIhyH",
+      "expanded_url": "https://twitter.com/eriktorenberg/status/1252335209984352257?s=20",
+      "display_url": "twitter.com/eriktorenberg/…"
+    }]
+  },
+  "context_annotations": [{
+    "domain": {
+      "id": "46",
+      "name": "Brand Category",
+      "description": "Categories within Brand Verticals that narrow down the scope of Brands"
+    },
+    "entity": {
+      "id": "783337372406517762",
+      "name": "Online Services"
+    }
+  }, {
+    "domain": {
+      "id": "47",
+      "name": "Brand",
+      "description": "Brands and Companies"
+    },
+    "entity": {
+      "id": "10032901311",
+      "name": "Airbnb"
+    }
+  }, {
+    "domain": {
+      "id": "65",
+      "name": "Interests and Hobbies Vertical",
+      "description": "Top level interests and hobbies groupings, like Food or Travel"
+    },
+    "entity": {
+      "id": "839159814991167489",
+      "name": "Travel",
+      "description": "Travel"
+    }
+  }, {
+    "domain": {
+      "id": "65",
+      "name": "Interests and Hobbies Vertical",
+      "description": "Top level interests and hobbies groupings, like Food or Travel"
+    },
+    "entity": {
+      "id": "847529762566230016",
+      "name": "Business and finance",
+      "description": "Business"
+    }
+  }, {
+    "domain": {
+      "id": "66",
+      "name": "Interests and Hobbies Category",
+      "description": "A grouping of interests and hobbies entities, like Novelty Food or Destinations"
+    },
+    "entity": {
+      "id": "847888632711061504",
+      "name": "Personal finance",
+      "description": "Personal finance"
+    }
+  }, {
+    "domain": {
+      "id": "66",
+      "name": "Interests and Hobbies Category",
+      "description": "A grouping of interests and hobbies entities, like Novelty Food or Destinations"
+    },
+    "entity": {
+      "id": "864938653063159808",
+      "name": "Hospitality",
+      "description": "Hospitality"
+    }
+  }, {
+    "domain": {
+      "id": "66",
+      "name": "Interests and Hobbies Category",
+      "description": "A grouping of interests and hobbies entities, like Novelty Food or Destinations"
+    },
+    "entity": {
+      "id": "1046567715022856192",
+      "name": "Venture capital",
+      "description": "Venture Capital"
+    }
+  }, {
+    "domain": {
+      "id": "67",
+      "name": "Interests and Hobbies",
+      "description": "Interests, opinions, and behaviors of individuals, groups, or cultures; like Speciality Cooking or Theme Parks"
+    },
+    "entity": {
+      "id": "847894353708068864",
+      "name": "Investing",
+      "description": "Investing"
+    }
+  }, {
+    "domain": {
+      "id": "46",
+      "name": "Brand Category",
+      "description": "Categories within Brand Verticals that narrow down the scope of Brands"
+    },
+    "entity": {
+      "id": "783337372406517762",
+      "name": "Online Services"
+    }
+  }, {
+    "domain": {
+      "id": "47",
+      "name": "Brand",
+      "description": "Brands and Companies"
+    },
+    "entity": {
+      "id": "10032901311",
+      "name": "Airbnb"
+    }
+  }, {
+    "domain": {
+      "id": "65",
+      "name": "Interests and Hobbies Vertical",
+      "description": "Top level interests and hobbies groupings, like Food or Travel"
+    },
+    "entity": {
+      "id": "847529762566230016",
+      "name": "Business and finance",
+      "description": "Business"
+    }
+  }, {
+    "domain": {
+      "id": "66",
+      "name": "Interests and Hobbies Category",
+      "description": "A grouping of interests and hobbies entities, like Novelty Food or Destinations"
+    },
+    "entity": {
+      "id": "849075881653846016",
+      "name": "Startups",
+      "description": "Startups"
+    }
+  }],
+  "created_at": "2020-04-21T18:12:10.000Z",
+  "text": "@eiaine Anecdotally, there seems to be more outliers as the cohorts have gotten bigger. \n\nMy thesis is that, since VC is a power law game, it"s all about proving that they repeatedly have Airbnb. \n\nClinkles do little damage to VC brands, since losers don"t matter\n\nhttps://t.co/g9wrDiIhyH",
+  "lang": "en",
+  "conversation_id": "1252653873249939458",
+  "referenced_tweets": [{
+    "type": "quoted",
+    "id": "1252335209984352257"
+  }, {
+    "type": "replied_to",
+    "id": "1252657171608657921"
+  }],
+  "id": "1252661420098908160",
+  "author_id": "1475495658",
+  "source": "Twitter Web App",
+  "in_reply_to_user_id": "21455761",
+  "public_metrics": {
+    "retweet_count": 0,
+    "reply_count": 1,
+    "like_count": 1,
+    "quote_count": 0
+  }
+}

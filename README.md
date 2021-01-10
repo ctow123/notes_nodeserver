@@ -10,3 +10,30 @@ API specs
 
 /tweets
 link twitter username to account scrap and auto - tag tweets
+
+
+## PLANNER API
+
+**Method**: `GET`
+
+**Authorization HEADER**: `tokenID required`
+
+**URL**: `/userCourses?userID=xxxx`
+
+**RESPONSE**
+```json
+{
+  "data": [{
+      "id": "5uDo8mno7CaoqNKAXn9W",
+      "subject": "CS",
+      "uid": "SfRmF6x5exSTQtd6LFae6IYFnUm2",
+      "subjectCourse": "CS3214",
+      "courseTitle": "Intro to Comp Org II",
+      "credits": 3,
+      "year": "2",
+      "term": "09"
+    }, {}, {}],
+  "msg":"search successful"
+}
+```
+_________________________
